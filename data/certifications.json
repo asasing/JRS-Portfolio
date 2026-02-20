@@ -1,0 +1,62 @@
+[
+  {
+    "id": "cert-001",
+    "name": "Power Platform Solution Architect Expert",
+    "year": "2024",
+    "organization": "Microsoft",
+    "description": "Expert-level certification for end-to-end Power Platform solution architecture, Dataverse modeling, and enterprise governance.",
+    "credentialUrl": "#",
+    "badgeColor": "#8b5cf6",
+    "order": 1
+  },
+  {
+    "id": "cert-002",
+    "name": "Azure Developer Associate",
+    "year": "2024",
+    "organization": "Microsoft",
+    "description": "Validates skills in designing, building, testing, and maintaining cloud applications and services on Microsoft Azure.",
+    "credentialUrl": "#",
+    "badgeColor": "#06b6d4",
+    "order": 2
+  },
+  {
+    "id": "cert-003",
+    "name": "Power Platform Developer Associate",
+    "year": "2023",
+    "organization": "Microsoft",
+    "description": "Validates skills in designing and developing Power Platform solutions including custom components, plugins, and integrations.",
+    "credentialUrl": "#",
+    "badgeColor": "#d946ef",
+    "order": 3
+  },
+  {
+    "id": "cert-004",
+    "name": "Power Platform Functional Consultant Associate",
+    "year": "2023",
+    "organization": "Microsoft",
+    "description": "Certification for configuring and extending Power Apps, Power Automate, and Dataverse for business solutions.",
+    "credentialUrl": "#",
+    "badgeColor": "#10b981",
+    "order": 4
+  },
+  {
+    "id": "cert-005",
+    "name": "Azure AI Engineer Associate",
+    "year": "2024",
+    "organization": "Microsoft",
+    "description": "Covers designing and implementing AI solutions using Azure Cognitive Services, Language Studio, and Azure Machine Learning.",
+    "credentialUrl": "#",
+    "badgeColor": "#f59e0b",
+    "order": 5
+  },
+  {
+    "id": "cert-006",
+    "name": "Automation Anywhere Advanced RPA Professional",
+    "year": "2020",
+    "organization": "Automation Anywhere",
+    "description": "Advanced RPA certification for building, deploying, and managing enterprise-grade bot automation workflows.",
+    "credentialUrl": "#",
+    "badgeColor": "#ef4444",
+    "order": 6
+  }
+]

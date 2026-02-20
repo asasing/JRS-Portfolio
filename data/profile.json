@@ -1,0 +1,58 @@
+{
+  "name": "John Roldan Sasing",
+  "tagline": "Power Platform & Dynamics 365 Engineer | AI & Automation | App Development",
+  "bio": "<p>I help digitize processes, reduce manual work, and scale using low-code solutions mainly through Microsoft Power Platform, AI &amp; Automations, and Custom App Development. <br /><br />Worked on different software development/support projects performing various tasks ranging from analysis, design, building, testing, deployment, production support and monitoring.<br /><br />I work closely with both technical teams and business stakeholders to ensure solutions are clear, measurable, and aligned with real business outcomes.</p>",
+  "profilePhoto": "/images/profile/9bc76f4e-1771510962982.jpg",
+  "experienceStartYear": 2018,
+  "profilePhotoFocusX": 48.05824499603376,
+  "profilePhotoFocusY": 22.38402305509152,
+  "profilePhotoZoom": 1,
+  "skills": [
+    "Power Apps",
+    "Power Automate",
+    "Power Pages",
+    "Dynamics 365 CE",
+    "Web Development",
+    "n8n",
+    "OpenAI / LLM",
+    "Azure",
+    "Power BI",
+    "JavaScript",
+    "C#",
+    "SQL",
+    "Azure DevOps"
+  ],
+  "stats": [
+    {
+      "label": "Years of Experience",
+      "value": "8+"
+    },
+    {
+      "label": "Microsoft Certifications",
+      "value": "5x"
+    },
+    {
+      "label": "Enterprise Projects",
+      "value": "20+"
+    }
+  ],
+  "socials": [
+    {
+      "platform": "LinkedIn",
+      "url": "https://linkedin.com/in/johnroldansasing",
+      "icon": "FaLinkedinIn"
+    },
+    {
+      "platform": "GitHub",
+      "url": "https://github.com/asasing",
+      "icon": "FaGithub"
+    },
+    {
+      "platform": "Email",
+      "url": "mailto:johnroldansasing@gmail.com",
+      "icon": "FaEnvelope"
+    }
+  ],
+  "email": "johnroldansasing@gmail.com",
+  "phone": "09165614326"
+}

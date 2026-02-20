@@ -1,0 +1,176 @@
+# CLAUDE.md
+
+## Purpose
+This file is a persistent project context and handoff note for future sessions.
+It documents architecture, data flow, key decisions, and recent changes implemented.
+
+## Project Overview
+- Project: `JRS-Portfolio`
+- Stack: Next.js App Router, React, TypeScript, Tailwind CSS v4, Framer Motion
+- Data source: local JSON files in `data/`
+- Admin panel: `/admin/*` for managing profile, projects, services, certifications
+
+## Run and Verify
+- Install: `npm install`
+- Dev server: `npm run dev`
+- Lint: `npm run lint`
+
+## Core Structure
+- App routes: `src/app/*`
+- Admin pages: `src/app/admin/*`
+- API routes: `src/app/api/*`
+- UI components: `src/components/*`
+- Shared types: `src/lib/types.ts`
+- JSON content: `data/profile.json`, `data/projects.json`, `data/services.json`, `data/certifications.json`
+- Uploaded images location: `public/images/<category>/...`
+
+## Auth and Admin Access
+- Login API: `src/app/api/auth/login/route.ts`
+- Middleware protection: `src/middleware.ts`
+- Cookie token name: `admin_token`
+- Password env support:
+  - `ADMIN_PASSWORD_HASH` (bcrypt preferred)
+  - fallback `ADMIN_PASSWORD`
+  - fallback `password` (lowercase, legacy compatibility)
+
+## Upload System
+- Upload endpoint: `POST /api/upload` (`src/app/api/upload/route.ts`)
+- Accepts image files and `category` form field
+- Stores files under `public/images/<category>`
+- Current policy: do **not** auto-delete replaced/removed files
+
+## Contact Form Email
+- Route: `src/app/api/contact/route.ts`
+- Uses nodemailer SMTP (Node runtime)
+- Default recipient fallback: `johnroldansasing@gmail.com`
+- Requires SMTP env values (especially `SMTP_USER`, `SMTP_PASS`)
+- Accepts `messageHtml` (rich HTML from RichTextEditor) or legacy `message` (plain text)
+- Uses `normalizeContactMessage()` from `src/lib/contact-message-normalizers.ts` to sanitize and normalize
+- Email delivers both `text:` (plain text) and `html:` parts
+- Message sanitization allows: `p br strong em u ul ol li a` (no headings, images, or scripts)
+
+## Environment Variables (Current Expectations)
+- `JWT_SECRET`
+- `ADMIN_PASSWORD_HASH`
+- Optional fallback auth vars: `ADMIN_PASSWORD`, `password`
+- Contact email vars:
+  - `CONTACT_TO_EMAIL`
+  - `SMTP_HOST`
+  - `SMTP_PORT`
+  - `SMTP_SECURE`
+  - `SMTP_USER`
+  - `SMTP_PASS`
+
+## Major UX/Feature Decisions Implemented
+1. Admin image upload-first UX
+- `ImageUploader` supports:
+  - preview
+  - `Replace Image`
+  - `Remove`
+  - optional manual path input
+- Applied to:
+  - profile photo in admin profile
+  - project thumbnail
+  - project gallery rows (gallery is now uploader-first, not text-only)
+
+2. Auto-calculate years of experience
+- Added `experienceStartYear` to `Profile`
+- Added default `experienceStartYear: 2018` to profile data
+- API normalizes/sanitizes this field
+- Portfolio hero computes `Years of Experience` dynamically as `N+`
+- If the stat is missing, it is injected at render time
+
+3. Admin button sizing fit
+- Added `admin` size variant in shared `Button` component
+- Applied to admin pages and admin dialogs
+- Goal: avoid cramped/overflowing rounded buttons in dashboard UI
+
+4. Recent works category ordering change
+- Added/positioned `Custom App Development` after `Azure Cloud` via project data ordering behavior
+
+5. Certification link behavior
+- Admin allows credential link editing
+- Portfolio certification cards open link in new tab when URL exists
+
+6. Rich text for project descriptions
+- Admin/projects modal uses `RichTextEditor` for the description field (bold, italic, underline, H1/H2/H3, lists, blockquotes, links, images)
+- Portfolio `ProjectDetail` modal renders the stored HTML via `dangerouslySetInnerHTML` with `.bio-content` CSS class
+- Backward compatible: existing plain-text descriptions render correctly in the `bio-content` div
+
+7. Rich text for contact form message
+- Contact form message field uses `RichTextEditor` with headings and images disabled, links allowed, `min-h-40`
+- API accepts `messageHtml` (rich HTML) and falls back to legacy `message` (plain text) for backward compat
+- New `src/lib/contact-message-normalizers.ts` handles sanitization and HTML→text conversion
+- Email is sent with both a plain-text and HTML body
+
+## Important Files Touched Recently
+- `src/app/globals.css`
+- `src/components/portfolio/Services.tsx`
+- `src/components/portfolio/Contact.tsx`
+- `src/components/ui/Button.tsx`
+- `src/components/admin/ImageUploader.tsx`
+- `src/app/admin/profile/page.tsx`
+- `src/app/admin/projects/page.tsx`
+- `src/app/admin/certifications/page.tsx`
+- `src/app/admin/services/page.tsx`
+- `src/app/admin/login/page.tsx`
+- `src/components/admin/DeleteDialog.tsx`
+- `src/components/portfolio/HeroAbout.tsx`
+- `src/app/api/profile/route.ts`
+- `src/app/api/contact/route.ts`
+- `src/lib/types.ts`
+- `data/profile.json`
+- `data/projects.json`
+- `src/components/admin/RichTextEditor.tsx`
+- `src/components/portfolio/ProjectDetail.tsx`
+- `src/lib/contact-message-normalizers.ts`
+
+## Known Issues / Caveats
+- `npm run lint` currently fails on existing rule `react-hooks/set-state-in-effect` in multiple files:
+  - `src/app/admin/certifications/page.tsx`
+  - `src/app/admin/profile/page.tsx`
+  - `src/app/admin/projects/page.tsx`
+  - `src/app/admin/services/page.tsx`
+  - `src/hooks/usePreloader.ts`
+- These are pre-existing lint-policy issues and not runtime blockers for current features.
+
+## Practical Notes for Future Sessions
+- Prefer JSON/API consistency over direct file edits from UI assumptions.
+- For admin media features, reuse `ImageUploader` and `/api/upload` first.
+- For profile changes, ensure `src/lib/types.ts`, `data/profile.json`, admin UI, and `/api/profile` stay aligned.
+- Preserve current decision: keep uploaded file history (no automatic deletion on replace/remove).
+
+## Change Log
+### 2026-02-19 (UI Spacing & Typography Pass)
+- Reduced hero name font size: `clamp(1.75rem, 5.5vw, 3.6rem)` desktop / `clamp(1.6rem, 8vw, 2.4rem)` mobile.
+- Removed `.portfolio-section` CSS padding rule from `globals.css`; section vertical spacing now managed per-component.
+- Removed `margin: 0; padding: 0;` from global `*` reset; relying on Tailwind preflight only.
+- Increased spacing between service cards: `space-y-8 md:space-y-10`.
+- Increased service card internal padding: `px-6 py-7 md:px-8 md:py-8` and row gap: `gap-6 md:gap-10`.
+- Increased Contact submit button padding: `px-16 py-[1.875rem]`.
+- Updated `DESIGN_SYSTEM.md` to reflect all spacing and typography changes.
+- Key files: `src/app/globals.css`, `src/components/portfolio/Services.tsx`, `src/components/portfolio/Contact.tsx`, `DESIGN_SYSTEM.md`.
+
+### 2026-02-19
+- Added `experienceStartYear` to profile model and API normalization.
+- Implemented auto-calculated `Years of Experience` (`N+`) in hero stats.
+- Upgraded admin `ImageUploader` to support preview + replace + remove + optional manual path.
+- Updated admin projects gallery to uploader-first rows.
+- Added admin-specific button size and applied it across admin pages/dialogs.
+- Wired contact form to SMTP email delivery with nodemailer and env-based config.
+- Improved auth login compatibility for hashed and plain env password values.
+- Added project context file (`CLAUDE.md`) for future handoff/reference.
+
+### 2026-02-20
+- Added rich text editing for project descriptions: admin/projects modal now uses `RichTextEditor`; portfolio `ProjectDetail` renders HTML with `.bio-content`.
+- Added rich text contact form message: contact form message field replaced with `RichTextEditor` (headings/images disabled, links allowed).
+- Added `src/lib/contact-message-normalizers.ts`: sanitizes and normalizes HTML/plain-text message input; used by contact API.
+- Updated contact API to accept `messageHtml`, normalize/sanitize it, and send both text+html email parts.
+- Extended `RichTextEditor` with optional `allowHeadings`, `allowImage`, `allowLinks`, `minHeightClassName` props.
+- Key files: `src/app/admin/projects/page.tsx`, `src/components/portfolio/ProjectDetail.tsx`, `src/components/portfolio/Contact.tsx`, `src/components/admin/RichTextEditor.tsx`, `src/app/api/contact/route.ts`, `src/lib/contact-message-normalizers.ts`.
+
+### Template For Next Entries
+- `YYYY-MM-DD`
+  - short summary of feature/fix
+  - key files touched
+  - known caveats follow-up

@@ -1,0 +1,27 @@
+[
+  {
+    "id": "cat-ai-automation",
+    "label": "AI & Automation",
+    "order": 1
+  },
+  {
+    "id": "cat-azure-cloud",
+    "label": "Azure Cloud",
+    "order": 2
+  },
+  {
+    "id": "cat-custom-app-development",
+    "label": "Custom App Development",
+    "order": 3
+  },
+  {
+    "id": "cat-power-platform",
+    "label": "Power Platform",
+    "order": 4
+  },
+  {
+    "id": "cat-automation",
+    "label": "Automation",
+    "order": 5
+  }
+]

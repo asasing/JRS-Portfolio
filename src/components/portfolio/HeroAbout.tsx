@@ -75,7 +75,7 @@ export default function HeroAbout({ profile }: HeroAboutProps) {
   }, [profile.name]);
 
   return (
-    <section id="about" className="min-h-screen flex items-center pt-20 pb-16">
+    <section id="about" className="min-h-screen flex items-center pt-20">
       <div className="site-container">
         <h1 className="hero-code-title">
           <span className="hero-code-title__text" aria-label={profile.name}>

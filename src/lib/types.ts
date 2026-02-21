@@ -18,6 +18,7 @@ export interface Project {
   id: string;
   title: string;
   category: string;
+  categories?: string[];
   description: string;
   thumbnail: string;
   thumbnailFocusX?: number;
@@ -25,6 +26,12 @@ export interface Project {
   thumbnailZoom?: number;
   gallery: string[];
   links: { label: string; url: string }[];
+  order: number;
+}
+
+export interface ProjectCategory {
+  id: string;
+  label: string;
   order: number;
 }
 

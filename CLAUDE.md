@@ -1,4 +1,4 @@
-# CLAUDE.md
+﻿# CLAUDE.md
 
 ## Purpose
 This file is a persistent project context and handoff note for future sessions.
@@ -21,7 +21,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - API routes: `src/app/api/*`
 - UI components: `src/components/*`
 - Shared types: `src/lib/types.ts`
-- JSON content: `data/profile.json`, `data/projects.json`, `data/services.json`, `data/certifications.json`
+- JSON content: `data/profile.json`, `data/projects.json`, `data/services.json`, `data/certifications.json`, `data/project-categories.json`
 - Uploaded images location: `public/images/<category>/...`
 
 ## Auth and Admin Access
@@ -44,9 +44,9 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Uses nodemailer SMTP (Node runtime)
 - Default recipient fallback: `johnroldansasing@gmail.com`
 - Requires SMTP env values (especially `SMTP_USER`, `SMTP_PASS`)
-- Accepts `messageHtml` (rich HTML from RichTextEditor) or legacy `message` (plain text)
+- Requires `name`, `email`, and `subject`; accepts `messageHtml` (rich HTML from RichTextEditor) or legacy `message` (plain text)
 - Uses `normalizeContactMessage()` from `src/lib/contact-message-normalizers.ts` to sanitize and normalize
-- Email delivers both `text:` (plain text) and `html:` parts
+- Email delivers both `text:` (plain text) and `html:` parts, and sets `replyTo` to sender email
 - Message sanitization allows: `p br strong em u ul ol li a` (no headings, images, or scripts)
 
 ## Environment Variables (Current Expectations)
@@ -85,30 +85,42 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Applied to admin pages and admin dialogs
 - Goal: avoid cramped/overflowing rounded buttons in dashboard UI
 
-4. Recent works category ordering change
-- Added/positioned `Custom App Development` after `Azure Cloud` via project data ordering behavior
-
-5. Certification link behavior
-- Admin allows credential link editing
-- Portfolio certification cards open link in new tab when URL exists
-
-6. Rich text for project descriptions
+4. Rich text for project descriptions
 - Admin/projects modal uses `RichTextEditor` for the description field (bold, italic, underline, H1/H2/H3, lists, blockquotes, links, images)
 - Portfolio `ProjectDetail` modal renders the stored HTML via `dangerouslySetInnerHTML` with `.bio-content` CSS class
 - Backward compatible: existing plain-text descriptions render correctly in the `bio-content` div
 
-7. Rich text for contact form message
-- Contact form message field uses `RichTextEditor` with headings and images disabled, links allowed, `min-h-40`
-- API accepts `messageHtml` (rich HTML) and falls back to legacy `message` (plain text) for backward compat
-- New `src/lib/contact-message-normalizers.ts` handles sanitization and HTML→text conversion
-- Email is sent with both a plain-text and HTML body
+5. Rich text for contact form message
+- Contact form message field uses `RichTextEditor` with headings and images disabled, links allowed
+- API accepts `messageHtml` (rich HTML) and falls back to legacy `message` (plain text) for backward compatibility
+- `src/lib/contact-message-normalizers.ts` handles sanitization and HTML-to-text conversion
+- Email is sent with both plain-text and HTML body
+
+6. Managed project categories + multi-category assignments
+- Added `project-categories.json` as ordered category source of truth
+- Projects support `categories: string[]` (canonical) while keeping legacy `category` compatibility
+- Admin/projects includes category CRUD + drag reorder + save
+- Project add/edit supports selecting multiple categories
+- Portfolio filter chips use managed category order, and clicking active chip toggles back to `All`
+
+7. Desktop projects rail interaction update
+- Desktop recent works uses native horizontal scrolling
+- Left/right controls are overlaid at the rail edges (instead of heading area)
+
+8. Contact form requirement and spacing adjustments
+- Public contact form includes required sender email input (`type="email"`)
+- Contact message editor min height increased to `min-h-52`
+- Send button reduced from oversized custom padding to balanced sizing
 
 ## Important Files Touched Recently
 - `src/app/globals.css`
 - `src/components/portfolio/Services.tsx`
 - `src/components/portfolio/Contact.tsx`
+- `src/components/portfolio/Projects.tsx`
+- `src/components/portfolio/ProjectDetail.tsx`
 - `src/components/ui/Button.tsx`
 - `src/components/admin/ImageUploader.tsx`
+- `src/components/admin/RichTextEditor.tsx`
 - `src/app/admin/profile/page.tsx`
 - `src/app/admin/projects/page.tsx`
 - `src/app/admin/certifications/page.tsx`
@@ -117,13 +129,17 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `src/components/admin/DeleteDialog.tsx`
 - `src/components/portfolio/HeroAbout.tsx`
 - `src/app/api/profile/route.ts`
+- `src/app/api/projects/route.ts`
+- `src/app/api/projects/[id]/route.ts`
+- `src/app/api/project-categories/route.ts`
 - `src/app/api/contact/route.ts`
 - `src/lib/types.ts`
+- `src/lib/project-normalizers.ts`
+- `src/lib/project-category-normalizers.ts`
+- `src/lib/contact-message-normalizers.ts`
 - `data/profile.json`
 - `data/projects.json`
-- `src/components/admin/RichTextEditor.tsx`
-- `src/components/portfolio/ProjectDetail.tsx`
-- `src/lib/contact-message-normalizers.ts`
+- `data/project-categories.json`
 
 ## Known Issues / Caveats
 - `npm run lint` currently fails on existing rule `react-hooks/set-state-in-effect` in multiple files:
@@ -141,36 +157,43 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Preserve current decision: keep uploaded file history (no automatic deletion on replace/remove).
 
 ## Change Log
-### 2026-02-19 (UI Spacing & Typography Pass)
-- Reduced hero name font size: `clamp(1.75rem, 5.5vw, 3.6rem)` desktop / `clamp(1.6rem, 8vw, 2.4rem)` mobile.
-- Removed `.portfolio-section` CSS padding rule from `globals.css`; section vertical spacing now managed per-component.
-- Removed `margin: 0; padding: 0;` from global `*` reset; relying on Tailwind preflight only.
-- Increased spacing between service cards: `space-y-8 md:space-y-10`.
-- Increased service card internal padding: `px-6 py-7 md:px-8 md:py-8` and row gap: `gap-6 md:gap-10`.
-- Increased Contact submit button padding: `px-16 py-[1.875rem]`.
-- Updated `DESIGN_SYSTEM.md` to reflect all spacing and typography changes.
-- Key files: `src/app/globals.css`, `src/components/portfolio/Services.tsx`, `src/components/portfolio/Contact.tsx`, `DESIGN_SYSTEM.md`.
+### 2026-02-19 (UI Spacing and Typography Pass)
+- Reduced hero name font size: `clamp(1.75rem, 5.5vw, 3.6rem)` desktop / `clamp(1.6rem, 8vw, 2.4rem)` mobile
+- Removed `.portfolio-section` CSS padding rule from `globals.css`; section vertical spacing now managed per-component
+- Removed `margin: 0; padding: 0;` from global `*` reset; relying on Tailwind preflight only
+- Increased spacing between service cards: `space-y-8 md:space-y-10`
+- Increased service card internal padding: `px-6 py-7 md:px-8 md:py-8` and row gap: `gap-6 md:gap-10`
+- Increased Contact submit button padding: `px-16 py-[1.875rem]`
+- Updated `DESIGN_SYSTEM.md` to reflect all spacing and typography changes
 
 ### 2026-02-19
-- Added `experienceStartYear` to profile model and API normalization.
-- Implemented auto-calculated `Years of Experience` (`N+`) in hero stats.
-- Upgraded admin `ImageUploader` to support preview + replace + remove + optional manual path.
-- Updated admin projects gallery to uploader-first rows.
-- Added admin-specific button size and applied it across admin pages/dialogs.
-- Wired contact form to SMTP email delivery with nodemailer and env-based config.
-- Improved auth login compatibility for hashed and plain env password values.
-- Added project context file (`CLAUDE.md`) for future handoff/reference.
+- Added `experienceStartYear` to profile model and API normalization
+- Implemented auto-calculated `Years of Experience` (`N+`) in hero stats
+- Upgraded admin `ImageUploader` to support preview + replace + remove + optional manual path
+- Updated admin projects gallery to uploader-first rows
+- Added admin-specific button size and applied it across admin pages/dialogs
+- Wired contact form to SMTP email delivery with nodemailer and env-based config
+- Improved auth login compatibility for hashed and plain env password values
+- Added project context file (`CLAUDE.md`) for future handoff/reference
 
 ### 2026-02-20
-- Added rich text editing for project descriptions: admin/projects modal now uses `RichTextEditor`; portfolio `ProjectDetail` renders HTML with `.bio-content`.
-- Added rich text contact form message: contact form message field replaced with `RichTextEditor` (headings/images disabled, links allowed).
-- Added `src/lib/contact-message-normalizers.ts`: sanitizes and normalizes HTML/plain-text message input; used by contact API.
-- Updated contact API to accept `messageHtml`, normalize/sanitize it, and send both text+html email parts.
-- Extended `RichTextEditor` with optional `allowHeadings`, `allowImage`, `allowLinks`, `minHeightClassName` props.
-- Key files: `src/app/admin/projects/page.tsx`, `src/components/portfolio/ProjectDetail.tsx`, `src/components/portfolio/Contact.tsx`, `src/components/admin/RichTextEditor.tsx`, `src/app/api/contact/route.ts`, `src/lib/contact-message-normalizers.ts`.
+- Added rich text editing for project descriptions: admin/projects modal now uses `RichTextEditor`; portfolio `ProjectDetail` renders HTML with `.bio-content`
+- Added rich text contact form message: contact form message field replaced with `RichTextEditor` (headings/images disabled, links allowed)
+- Added `src/lib/contact-message-normalizers.ts`: sanitizes and normalizes HTML/plain-text message input; used by contact API
+- Updated contact API to accept `messageHtml`, normalize/sanitize it, and send both text+html email parts
+- Extended `RichTextEditor` with optional `allowHeadings`, `allowImage`, `allowLinks`, `minHeightClassName` props
+
+### 2026-02-20 (Categories + Projects Rail + Contact Validation)
+- Added managed project categories data model and API: `data/project-categories.json`, `src/app/api/project-categories/route.ts`, `src/lib/project-category-normalizers.ts`
+- Extended project normalization to support canonical `categories[]` with legacy `category` fallback compatibility
+- Updated admin projects: sortable category manager, multi-category selection in create/edit form, category table display as joined labels
+- Updated public projects: filter chips sourced from managed categories, active-chip toggle-to-`All`, desktop native horizontal rail with overlay edge navigation controls
+- Contact form now requires sender email, validates it server-side, includes email in message payload, and sets SMTP `replyTo`
+- Contact UI tweaks: message editor min height `min-h-52`, send button reduced to balanced size
 
 ### Template For Next Entries
 - `YYYY-MM-DD`
   - short summary of feature/fix
   - key files touched
   - known caveats follow-up
+

@@ -11,13 +11,13 @@
     "Power Apps",
     "Power Automate",
     "Power Pages",
-    "Dynamics 365 CE",
+    "Dynamics 365",
     "Web Development",
     "n8n",
     "OpenAI / LLM",
+    "JavaScript",
     "Azure",
     "Power BI",
-    "JavaScript",
     "C#",
     "SQL",
     "Azure DevOps"
@@ -28,12 +28,16 @@
       "value": "8+"
     },
     {
-      "label": "Microsoft Certifications",
-      "value": "5x"
+      "label": "Enterprise Projects",
+      "value": "25+"
     },
     {
-      "label": "Enterprise Projects",
-      "value": "20+"
+      "label": "Projects",
+      "value": "10+"
+    },
+    {
+      "label": "Certifications and Licenses",
+      "value": "10x"
     }
   ],
   "socials": [

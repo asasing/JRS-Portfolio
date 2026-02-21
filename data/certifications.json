@@ -58,5 +58,45 @@
     "credentialUrl": "#",
     "badgeColor": "#ef4444",
     "order": 6
+  },
+  {
+    "id": "cert-d44c49a1",
+    "name": "Accenture Agile Certification Program",
+    "year": "2021",
+    "organization": "Accenture",
+    "description": "Internal training and industry-recognized certifications focused on enabling Agile, Scrum, and DevOps methodologies at scale within the company and for its clients.",
+    "credentialUrl": "",
+    "badgeColor": "#8b5cf6",
+    "order": 7
+  },
+  {
+    "id": "cert-614c3805",
+    "name": "Certified Kanban Associate",
+    "year": "2020",
+    "organization": "International Scrum Institute™ (Scrum Institute)",
+    "description": "Fundamentals of Kanban. It is designed for agile practitioners and project managers looking to validate their Kanban knowledge",
+    "credentialUrl": "",
+    "badgeColor": "#f45ff7",
+    "order": 8
+  },
+  {
+    "id": "cert-fc20cebc",
+    "name": "Scrum Associate Accredited Certification",
+    "year": "2020",
+    "organization": "International Scrum Institute™ (Scrum Institute)",
+    "description": "The Scrum Associate Accredited Certification from the International Scrum Institute™ (ISI) is an online, entry-level certification designed to validate foundational knowledge of Agile Scrum principles.",
+    "credentialUrl": "",
+    "badgeColor": "#5fd8f7",
+    "order": 9
+  },
+  {
+    "id": "cert-3f1df0fc",
+    "name": "Scrum Foundation Professional Certificate",
+    "year": "2020",
+    "organization": "Certiprof",
+    "description": "Covers basic Agile principles, roles, events, and artifacts, making it ideal for beginners, team members, or managers starting their Agile journey.",
+    "credentialUrl": "",
+    "badgeColor": "#f78d5f",
+    "order": 10
   }
 ]

@@ -110,7 +110,7 @@ Shared `Button` sizes:
 - `admin`: `px-6 py-3`
 
 Notes:
-- Contact submit overrides with `px-16 py-[1.875rem]` for generous breathing room.
+- Contact submit uses `md` sizing with `px-10 py-4` for balanced weight.
 - Compact project filter chips use `.pill-button`.
 
 ### Cards
@@ -153,7 +153,7 @@ Title with one gradient-highlighted word
   - `minHeightClassName?: string` — Tailwind min-height class for the editor area (default `"min-h-48"`)
 - Output: HTML string stored and served as-is
 - Rendered in portfolio with `.bio-content` CSS class (see `globals.css`)
-- Contact form variant: `allowHeadings={false}` `allowImage={false}` `allowLinks` `minHeightClassName="min-h-40"`
+- Contact form variant: `allowHeadings={false}` `allowImage={false}` `allowLinks` `minHeightClassName="min-h-52"`
 
 ### Services Icons
 Supported icon source values:
@@ -194,10 +194,14 @@ Supported icon source values:
 
 ### Projects
 ```
-[Filter chips]                      [<- -> arrows on desktop]
+[Managed category chips, multi-category filter]
 [Cards grid on mobile/tablet]
-[Horizontal slider on desktop]
+[Native horizontal rail on desktop with overlay edge arrows]
 ```
+
+- Filter chips are driven by admin-managed project categories (`project-categories.json`).
+- Clicking an already active category toggles back to `All`.
+- Desktop rail supports native horizontal scroll (trackpad/wheel/swipe) plus left/right overlay controls.
 
 ### Certifications
 ```
@@ -207,10 +211,13 @@ Responsive card grid with year badge and optional credential link
 ### Contact
 ```
 [Heading + contact info]
-[Name] [Subject]
+[Name] [Email] [Subject]
 [Rich text message (bold/italic/underline/lists/links; no headings or images)]
 [SEND MESSAGE ->]
 ```
+
+- `Email` and `Subject` are required in the form and server validation.
+- Message editor minimum height for contact is `min-h-52`.
 
 ---
 

@@ -1,6 +1,7 @@
 export const SITE_NAME = "JRS";
 export const SITE_TITLE = "John Roldan Sasing | Portfolio";
 export const SITE_DESCRIPTION = "Full Stack Developer - Personal Portfolio";
+export const DEFAULT_PROJECT_THUMBNAIL = "/images/projects/placeholder-1.svg";
 
 export const NAV_LINKS = [
   { label: "About", href: "#about" },

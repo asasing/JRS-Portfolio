@@ -6,24 +6,44 @@ import { Project } from "@/lib/types";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import { FaChevronLeft, FaChevronRight, FaTimes, FaExternalLinkAlt } from "react-icons/fa";
+import { DEFAULT_PROJECT_THUMBNAIL } from "@/lib/constants";
 
 interface ProjectDetailProps {
   project: Project;
   onClose: () => void;
 }
 
+function getProjectCategories(project: Project): string[] {
+  const categories = Array.isArray(project.categories)
+    ? project.categories
+        .map((label) => label.trim())
+        .filter(Boolean)
+    : [];
+
+  if (categories.length > 0) return categories;
+
+  const legacy = project.category?.trim() || "";
+  return legacy ? [legacy] : [];
+}
+
 export default function ProjectDetail({ project, onClose }: ProjectDetailProps) {
   const [currentImage, setCurrentImage] = useState(0);
+  const fallbackThumbnail = project.thumbnail?.trim() || DEFAULT_PROJECT_THUMBNAIL;
+  const validGallery = project.gallery
+    .map((image) => image.trim())
+    .filter(Boolean);
+  const activeImage = validGallery[currentImage] || validGallery[0] || fallbackThumbnail;
+  const categoryLabel = getProjectCategories(project).join(" • ");
 
   const prevImage = () => {
     setCurrentImage((prev) =>
-      prev === 0 ? project.gallery.length - 1 : prev - 1
+      prev === 0 ? validGallery.length - 1 : prev - 1
     );
   };
 
   const nextImage = () => {
     setCurrentImage((prev) =>
-      prev === project.gallery.length - 1 ? 0 : prev + 1
+      prev === validGallery.length - 1 ? 0 : prev + 1
     );
   };
 
@@ -40,9 +60,9 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
 
         {/* Gallery slider */}
         <div className="relative aspect-video rounded-xl overflow-hidden bg-bg-primary mb-6">
-          {project.gallery.length > 0 && (
+          {activeImage && (
             <Image
-              src={project.gallery[currentImage]}
+              src={activeImage}
               alt={`${project.title} - Image ${currentImage + 1}`}
               fill
               className="object-cover"
@@ -51,7 +71,7 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
           )}
 
           {/* Navigation arrows */}
-          {project.gallery.length > 1 && (
+          {validGallery.length > 1 && (
             <>
               <button
                 onClick={prevImage}
@@ -68,16 +88,16 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
 
               {/* Image counter */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/60 backdrop-blur-sm rounded-full text-sm text-white">
-                {currentImage + 1} / {project.gallery.length}
+                {currentImage + 1} / {validGallery.length}
               </div>
             </>
           )}
         </div>
 
         {/* Gallery dots */}
-        {project.gallery.length > 1 && (
+        {validGallery.length > 1 && (
           <div className="flex justify-center gap-2 mb-6">
-            {project.gallery.map((_, i) => (
+            {validGallery.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentImage(i)}
@@ -92,7 +112,7 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
         {/* Project info */}
         <div>
           <span className="text-xs text-text-muted uppercase tracking-wider">
-            {project.category}
+            {categoryLabel || "Uncategorized"}
           </span>
           <h3 className="text-2xl font-bold text-text-primary mt-1 mb-3">
             {project.title}

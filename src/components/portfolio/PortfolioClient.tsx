@@ -1,6 +1,12 @@
 "use client";
 
-import { Profile, Project, Service, Certification } from "@/lib/types";
+import {
+  Profile,
+  Project,
+  Service,
+  Certification,
+  ProjectCategory,
+} from "@/lib/types";
 import { usePreloader } from "@/hooks/usePreloader";
 import Preloader from "./Preloader";
 import Header from "./Header";
@@ -14,6 +20,7 @@ import Footer from "./Footer";
 interface PortfolioClientProps {
   profile: Profile;
   projects: Project[];
+  projectCategories: ProjectCategory[];
   services: Service[];
   certifications: Certification[];
 }
@@ -21,6 +28,7 @@ interface PortfolioClientProps {
 export default function PortfolioClient({
   profile,
   projects,
+  projectCategories,
   services,
   certifications,
 }: PortfolioClientProps) {
@@ -35,7 +43,7 @@ export default function PortfolioClient({
         <div className="section-separator" />
         <Services services={services} />
         <div className="section-separator" />
-        <Projects projects={projects} />
+        <Projects projects={projects} projectCategories={projectCategories} />
         <div className="section-separator" />
         <Certifications certifications={certifications} />
         <div className="section-separator" />

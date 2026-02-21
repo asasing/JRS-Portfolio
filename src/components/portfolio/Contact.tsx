@@ -12,12 +12,19 @@ interface ContactProps {
 }
 
 export default function Contact({ profile }: ContactProps) {
-  const [formData, setFormData] = useState({ name: "", subject: "", messageHtml: "" });
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    subject: "",
+    messageHtml: "",
+  });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
+  const [errorMessage, setErrorMessage] = useState("Failed to send. Please try again.");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("sending");
+    setErrorMessage("Failed to send. Please try again.");
 
     try {
       const res = await fetch("/api/contact", {
@@ -25,6 +32,7 @@ export default function Contact({ profile }: ContactProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           name: formData.name,
+          email: formData.email,
           subject: formData.subject,
           messageHtml: formData.messageHtml,
         }),
@@ -32,9 +40,13 @@ export default function Contact({ profile }: ContactProps) {
 
       if (res.ok) {
         setStatus("sent");
-        setFormData({ name: "", subject: "", messageHtml: "" });
+        setFormData({ name: "", email: "", subject: "", messageHtml: "" });
         setTimeout(() => setStatus("idle"), 3000);
       } else {
+        const payload = (await res.json().catch(() => null)) as { error?: string } | null;
+        if (payload?.error) {
+          setErrorMessage(payload.error);
+        }
         setStatus("error");
       }
     } catch {
@@ -60,11 +72,18 @@ export default function Contact({ profile }: ContactProps) {
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-5">
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
             <Input
               placeholder="Name"
               value={formData.name}
               onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              required
+            />
+            <Input
+              type="email"
+              placeholder="Email"
+              value={formData.email}
+              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
               required
             />
             <Input
@@ -80,15 +99,15 @@ export default function Contact({ profile }: ContactProps) {
             allowHeadings={false}
             allowImage={false}
             allowLinks
-            minHeightClassName="min-h-40"
+            minHeightClassName="min-h-52"
             onChange={(messageHtml) => setFormData({ ...formData, messageHtml })}
           />
           <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="text-sm">
               {status === "sent" && <span className="text-year-green">Message sent successfully!</span>}
-              {status === "error" && <span className="text-accent-pink">Failed to send. Please try again.</span>}
+              {status === "error" && <span className="text-accent-pink">{errorMessage}</span>}
             </div>
-            <Button type="submit" size="lg" className="px-16 py-[1.875rem]" disabled={status === "sending"}>
+            <Button type="submit" size="md" className="px-10 py-4" disabled={status === "sending"}>
               {status === "sending" ? "SENDING..." : "SEND MESSAGE ->"}
             </Button>
           </div>

@@ -217,6 +217,14 @@ Supported icon source values:
 - Filter chips are driven by admin-managed project categories (`project-categories.json`).
 - Clicking an already active category toggles back to `All`.
 - Desktop rail supports native horizontal scroll (trackpad/wheel/swipe) plus left/right overlay controls.
+- Recent Works cards keep uniform rhythm:
+- fixed media ratio (`aspect-[4/3]`)
+- single-line category clamp
+- two-line title clamp
+- Full image viewing is modal-first:
+- cards do not expand inline to show full images
+- modal image list uses `thumbnail + gallery[]` (trimmed, deduped, non-empty)
+- modal main image uses full-fit rendering (`object-contain`)
 
 ### Certifications
 ```

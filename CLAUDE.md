@@ -151,6 +151,10 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `data/projects.json`
 - `data/project-categories.json`
 - `data/certifications.json`
+- `.codex/skills/portfolio-maintainer/SKILL.md`
+- `.codex/skills/portfolio-maintainer/agents/openai.yaml`
+- `.codex/skills/portfolio-maintainer/references/*`
+- `README.md`
 
 ## Known Issues / Caveats
 - `npm run lint` currently fails on existing rule `react-hooks/set-state-in-effect` in multiple files:
@@ -208,6 +212,13 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Updated certifications API POST/PUT/GET normalization for `credentialId`, `thumbnail`, `paletteCode`.
 - Updated admin certifications form: credential ID field, provider palette selector, and single thumbnail upload.
 - Updated public certifications cards: neutral year badge, provider palette accents, optional credential ID display, and thumbnail click-to-preview modal.
+
+### 2026-02-21 (Recent Works Consistency + Skill/Docs Consolidation)
+- Updated Recent Works cards to keep consistent visual height rhythm using category/title clamp classes.
+- Updated project detail modal gallery to use deduped `thumbnail + gallery[]` image list with full-image (`object-contain`) viewing and stable viewer height.
+- Fixed project category separator rendering to proper bullet (`•`) in modal and cards.
+- Replaced boilerplate `README.md` with project-specific runbook, env semantics, and feature/data map.
+- Added repo-local skill `.codex/skills/portfolio-maintainer` with references for architecture, data contracts, UI rules, and release checklist.
 
 ### Template For Next Entries
 - `YYYY-MM-DD`

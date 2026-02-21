@@ -1,0 +1,6 @@
+interface_version: 1
+skill:
+  name: portfolio-maintainer
+  display_name: Portfolio Maintainer
+  short_description: Keep JRS portfolio UI, data contracts, APIs, and docs in sync.
+  default_prompt: Maintain and extend portfolio/admin features while preserving data-contract, API normalization, and design-system consistency.

@@ -1,36 +1,62 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# JRS Portfolio
 
-## Getting Started
+A personal portfolio + admin CMS built with Next.js App Router, TypeScript, and Tailwind CSS.
 
-First, run the development server:
+## Overview
+- Public site sections: Hero/About, Services, Recent Works, Certifications, Contact
+- Admin dashboard for content management: profile, services, projects, certifications, categories
+- Data persistence via local JSON files in `data/`
+- Upload pipeline for images under `public/images/<category>/`
 
+## Runbook
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+npm run build
+npm run lint
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Environment Variables
+Set these in `.env`:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+- `JWT_SECRET`
+- `ADMIN_PASSWORD_HASH` (preferred) or `ADMIN_PASSWORD`
+- `CONTACT_TO_EMAIL`
+- `SMTP_HOST`
+- `SMTP_PORT`
+- `SMTP_SECURE`
+- `SMTP_USER`
+- `SMTP_PASS`
+- `CONTACT_DRY_RUN` (optional)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Contact semantics:
+- Real SMTP send is the default expectation.
+- `CONTACT_DRY_RUN=true` is explicit opt-in for local testing only.
+- If SMTP config is missing, contact API returns service-unavailable error.
 
-## Learn More
+## Data Files and Contracts
+- `data/profile.json` -> profile/about/hero data
+- `data/services.json` -> services list
+- `data/projects.json` -> projects content, media, categories
+- `data/project-categories.json` -> ordered category chips source
+- `data/certifications.json` -> certifications, provider palette, metadata
 
-To learn more about Next.js, take a look at the following resources:
+## Feature Map
+Admin pages and related APIs:
+- `/admin/profile` <-> `/api/profile`
+- `/admin/services` <-> `/api/services`
+- `/admin/projects` <-> `/api/projects`, `/api/project-categories`
+- `/admin/certifications` <-> `/api/certifications`
+- Uploads via `/api/upload`
+- Contact form via `/api/contact`
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Where To Update What
+- Visual rules and spacing/tokens: `DESIGN_SYSTEM.md`
+- Architecture notes + change history: `CLAUDE.md`
+- Shared contracts: `src/lib/types.ts`
+- Normalization logic: `src/lib/*-normalizers.ts`
+- Reusable codex workflow: `.codex/skills/portfolio-maintainer/`
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## Notes
+- Tailwind-only styling (no Bootstrap).
+- Keep admin edit flow, API normalization, and public rendering aligned when adding fields.

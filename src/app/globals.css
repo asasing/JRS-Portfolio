@@ -262,3 +262,16 @@ body {
 .bio-editor-content p:last-child {
   margin-bottom: 0;
 }
+
+.project-card-category {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-card-title {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}

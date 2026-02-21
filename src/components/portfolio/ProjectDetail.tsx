@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -29,28 +29,23 @@ function getProjectCategories(project: Project): string[] {
 export default function ProjectDetail({ project, onClose }: ProjectDetailProps) {
   const [currentImage, setCurrentImage] = useState(0);
   const fallbackThumbnail = project.thumbnail?.trim() || DEFAULT_PROJECT_THUMBNAIL;
-  const validGallery = project.gallery
-    .map((image) => image.trim())
-    .filter(Boolean);
-  const activeImage = validGallery[currentImage] || validGallery[0] || fallbackThumbnail;
+  const images = [fallbackThumbnail, ...project.gallery.map((image) => image.trim())].filter(
+    (image, index, arr) => Boolean(image) && arr.indexOf(image) === index
+  );
+  const activeImage = images[currentImage] || images[0] || fallbackThumbnail;
   const categoryLabel = getProjectCategories(project).join(" • ");
 
   const prevImage = () => {
-    setCurrentImage((prev) =>
-      prev === 0 ? validGallery.length - 1 : prev - 1
-    );
+    setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
   };
 
   const nextImage = () => {
-    setCurrentImage((prev) =>
-      prev === validGallery.length - 1 ? 0 : prev + 1
-    );
+    setCurrentImage((prev) => (prev === images.length - 1 ? 0 : prev + 1));
   };
 
   return (
-    <Modal isOpen={true} onClose={onClose}>
+    <Modal isOpen={true} onClose={onClose} className="max-w-5xl overflow-hidden">
       <div className="p-6 md:p-8">
-        {/* Close button */}
         <button
           onClick={onClose}
           className="absolute top-4 right-4 w-10 h-10 rounded-full border border-border-subtle flex items-center justify-center text-text-muted hover:text-text-primary hover:border-accent-purple transition-colors z-10 cursor-pointer"
@@ -58,20 +53,18 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
           <FaTimes size={16} />
         </button>
 
-        {/* Gallery slider */}
-        <div className="relative aspect-video rounded-xl overflow-hidden bg-bg-primary mb-6">
+        <div className="relative h-[52vh] min-h-[320px] max-h-[620px] rounded-xl overflow-hidden bg-bg-primary mb-6 border border-border-subtle">
           {activeImage && (
             <Image
               src={activeImage}
               alt={`${project.title} - Image ${currentImage + 1}`}
               fill
-              className="object-cover"
-              sizes="(max-width: 768px) 100vw, 800px"
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 1000px"
             />
           )}
 
-          {/* Navigation arrows */}
-          {validGallery.length > 1 && (
+          {images.length > 1 && (
             <>
               <button
                 onClick={prevImage}
@@ -86,18 +79,16 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
                 <FaChevronRight size={18} />
               </button>
 
-              {/* Image counter */}
               <div className="absolute bottom-4 left-1/2 -translate-x-1/2 px-3 py-1 bg-black/60 backdrop-blur-sm rounded-full text-sm text-white">
-                {currentImage + 1} / {validGallery.length}
+                {currentImage + 1} / {images.length}
               </div>
             </>
           )}
         </div>
 
-        {/* Gallery dots */}
-        {validGallery.length > 1 && (
+        {images.length > 1 && (
           <div className="flex justify-center gap-2 mb-6">
-            {validGallery.map((_, i) => (
+            {images.map((_, i) => (
               <button
                 key={i}
                 onClick={() => setCurrentImage(i)}
@@ -109,20 +100,16 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
           </div>
         )}
 
-        {/* Project info */}
         <div>
           <span className="text-xs text-text-muted uppercase tracking-wider">
             {categoryLabel || "Uncategorized"}
           </span>
-          <h3 className="text-2xl font-bold text-text-primary mt-1 mb-3">
-            {project.title}
-          </h3>
+          <h3 className="text-2xl font-bold text-text-primary mt-1 mb-3">{project.title}</h3>
           <div
             className="bio-content text-text-secondary leading-relaxed mb-6"
             dangerouslySetInnerHTML={{ __html: project.description }}
           />
 
-          {/* Links */}
           <div className="flex flex-wrap gap-3">
             {project.links.map((link) => (
               <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer">

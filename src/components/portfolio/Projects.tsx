@@ -188,7 +188,7 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
                 <div
                   key={`desktop-${project.id}`}
                   data-project-card="true"
-                  className="min-w-[340px] xl:min-w-[360px] 2xl:min-w-[380px]"
+                  className="min-w-[340px] xl:min-w-[360px] 2xl:min-w-[380px] h-full"
                 >
                   <ProjectCard
                     project={project}
@@ -249,7 +249,7 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
   return (
     <div
       ref={ref}
-      className={`cursor-pointer group transition-all duration-700 ${
+      className={`cursor-pointer group h-full flex flex-col transition-all duration-700 ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       }`}
       onClick={onClick}
@@ -271,10 +271,10 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
-      <p className="text-xs text-text-muted uppercase tracking-wider mb-1">
+      <p className="project-card-category text-xs text-text-muted uppercase tracking-wider mb-1">
         {categoryLabel || "Uncategorized"}
       </p>
-      <h3 className="text-base md:text-lg font-semibold text-text-primary group-hover:text-accent-purple transition-colors">
+      <h3 className="project-card-title text-base md:text-lg font-semibold text-text-primary group-hover:text-accent-purple transition-colors min-h-[3.2rem] md:min-h-[3.4rem]">
         {project.title}
       </h3>
     </div>

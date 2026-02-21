@@ -42,6 +42,9 @@ export interface Certification {
   organization: string;
   description: string;
   credentialUrl?: string;
+  credentialId?: string;
+  thumbnail?: string;
+  paletteCode?: string;
   badgeColor: string;
   order: number;
 }

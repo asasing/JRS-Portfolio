@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readJsonFile, writeJsonFile } from "@/lib/data";
 import { authenticateRequest } from "@/lib/api-auth";
 import { Certification } from "@/lib/types";
+import { sanitizePaletteCode } from "@/lib/certification-palettes";
 
 function normalizeCredentialUrl(url: unknown): string {
   if (typeof url !== "string") return "";
@@ -13,6 +14,14 @@ function normalizeCredentialUrl(url: unknown): string {
   return `https://${trimmed}`;
 }
 
+function normalizeCredentialId(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeThumbnailPath(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
   const certs = await readJsonFile<Certification[]>("certifications.json");
@@ -22,7 +31,12 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  return NextResponse.json(cert);
+  return NextResponse.json({
+    ...cert,
+    credentialId: normalizeCredentialId(cert.credentialId),
+    thumbnail: normalizeThumbnailPath(cert.thumbnail),
+    paletteCode: sanitizePaletteCode(cert.paletteCode, cert.organization),
+  });
 }
 
 export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -47,6 +61,18 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       typeof body.credentialUrl === "string"
         ? normalizeCredentialUrl(body.credentialUrl)
         : certs[index].credentialUrl || "",
+    credentialId:
+      typeof body.credentialId === "string"
+        ? normalizeCredentialId(body.credentialId)
+        : normalizeCredentialId(certs[index].credentialId),
+    thumbnail:
+      typeof body.thumbnail === "string"
+        ? normalizeThumbnailPath(body.thumbnail)
+        : normalizeThumbnailPath(certs[index].thumbnail),
+    paletteCode: sanitizePaletteCode(
+      body.paletteCode ?? certs[index].paletteCode,
+      body.organization ?? certs[index].organization
+    ),
   };
   await writeJsonFile("certifications.json", certs);
 

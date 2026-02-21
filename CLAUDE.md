@@ -48,6 +48,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Uses `normalizeContactMessage()` from `src/lib/contact-message-normalizers.ts` to sanitize and normalize
 - Email delivers both `text:` (plain text) and `html:` parts, and sets `replyTo` to sender email
 - Message sanitization allows: `p br strong em u ul ol li a` (no headings, images, or scripts)
+- `CONTACT_DRY_RUN=true` is explicit opt-in only; default expectation is real SMTP send
 
 ## Environment Variables (Current Expectations)
 - `JWT_SECRET`
@@ -112,6 +113,12 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Contact message editor min height increased to `min-h-52`
 - Send button reduced from oversized custom padding to balanced sizing
 
+9. Certification metadata and provider palette system
+- Certifications support optional `credentialId`, optional `thumbnail`, and optional `paletteCode`.
+- Provider color accents are resolved from organization name using one of 10 palette codes.
+- Admin certifications includes palette selector (auto by provider + manual override) and single thumbnail upload.
+- Public certification cards show credential ID when present and support thumbnail click-to-preview.
+
 ## Important Files Touched Recently
 - `src/app/globals.css`
 - `src/components/portfolio/Services.tsx`
@@ -133,13 +140,17 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `src/app/api/projects/[id]/route.ts`
 - `src/app/api/project-categories/route.ts`
 - `src/app/api/contact/route.ts`
+- `src/app/api/certifications/route.ts`
+- `src/app/api/certifications/[id]/route.ts`
 - `src/lib/types.ts`
+- `src/lib/certification-palettes.ts`
 - `src/lib/project-normalizers.ts`
 - `src/lib/project-category-normalizers.ts`
 - `src/lib/contact-message-normalizers.ts`
 - `data/profile.json`
 - `data/projects.json`
 - `data/project-categories.json`
+- `data/certifications.json`
 
 ## Known Issues / Caveats
 - `npm run lint` currently fails on existing rule `react-hooks/set-state-in-effect` in multiple files:
@@ -190,6 +201,13 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Updated public projects: filter chips sourced from managed categories, active-chip toggle-to-`All`, desktop native horizontal rail with overlay edge navigation controls
 - Contact form now requires sender email, validates it server-side, includes email in message payload, and sets SMTP `replyTo`
 - Contact UI tweaks: message editor min height `min-h-52`, send button reduced to balanced size
+
+### 2026-02-20 (Certification Provider Palette + Thumbnail + Credential ID)
+- Added certification palette system with 10 provider palette codes and provider-based auto mapping (`src/lib/certification-palettes.ts`).
+- Extended certifications data model with optional `credentialId`, `thumbnail`, and `paletteCode`.
+- Updated certifications API POST/PUT/GET normalization for `credentialId`, `thumbnail`, `paletteCode`.
+- Updated admin certifications form: credential ID field, provider palette selector, and single thumbnail upload.
+- Updated public certifications cards: neutral year badge, provider palette accents, optional credential ID display, and thumbnail click-to-preview modal.
 
 ### Template For Next Entries
 - `YYYY-MM-DD`

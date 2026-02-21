@@ -131,6 +131,21 @@ Notes:
 - Pill shape: `px-3 py-1 rounded-full text-xs`
 - Dynamic color via inline style with 20% alpha background.
 
+### Certification Provider Palettes
+- Certifications use provider-based palettes (`paletteCode`) instead of manual year color coding.
+- Available palette codes:
+  - `provider-blue`
+  - `provider-cyan`
+  - `provider-green`
+  - `provider-emerald`
+  - `provider-amber`
+  - `provider-orange`
+  - `provider-red`
+  - `provider-rose`
+  - `provider-violet`
+  - `provider-slate`
+- Provider maps automatically by organization name; admin can override.
+
 ### Section Heading Pattern
 ```
 [accent dot] OVERLINE (uppercase, tracked)
@@ -205,7 +220,7 @@ Supported icon source values:
 
 ### Certifications
 ```
-Responsive card grid with year badge and optional credential link
+Responsive card grid with neutral year badge, provider palette accents, optional credential ID/link, and optional thumbnail with image preview
 ```
 
 ### Contact
@@ -218,6 +233,7 @@ Responsive card grid with year badge and optional credential link
 
 - `Email` and `Subject` are required in the form and server validation.
 - Message editor minimum height for contact is `min-h-52`.
+- Real SMTP sending is default behavior; dry-run requires explicit `CONTACT_DRY_RUN=true`.
 
 ---
 

@@ -31,11 +31,27 @@ function normalizeThumbnail(value: unknown): string {
   return thumbnail || DEFAULT_PROJECT_THUMBNAIL;
 }
 
+function dedupePaths(paths: string[]): string[] {
+  const seen = new Set<string>();
+  const unique: string[] = [];
+
+  for (const item of paths) {
+    const key = item.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(item);
+  }
+
+  return unique;
+}
+
 function normalizeGallery(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
-  return value
+  return dedupePaths(
+    value
     .map((item) => (typeof item === "string" ? item.trim() : ""))
-    .filter(Boolean);
+    .filter(Boolean)
+  );
 }
 
 function normalizeLinks(value: unknown): { label: string; url: string }[] {
@@ -89,6 +105,12 @@ export function normalizeProject(project: Partial<Project>): Project {
     project.categories,
     project.category
   );
+  const normalizedGallery = normalizeGallery(project.gallery);
+  const normalizedThumbnail = normalizeThumbnail(project.thumbnail);
+  const thumbnail =
+    normalizedThumbnail !== DEFAULT_PROJECT_THUMBNAIL
+      ? normalizedThumbnail
+      : normalizedGallery[0] || DEFAULT_PROJECT_THUMBNAIL;
 
   return {
     id: project.id || "",
@@ -96,11 +118,11 @@ export function normalizeProject(project: Partial<Project>): Project {
     category: normalizedCategories[0] || "",
     categories: normalizedCategories,
     description: project.description || "",
-    thumbnail: normalizeThumbnail(project.thumbnail),
+    thumbnail,
     thumbnailFocusX: normalizeFocusValue(project.thumbnailFocusX, 50),
     thumbnailFocusY: normalizeFocusValue(project.thumbnailFocusY, 50),
     thumbnailZoom: normalizeZoomValue(project.thumbnailZoom, 1),
-    gallery: normalizeGallery(project.gallery),
+    gallery: normalizedGallery,
     links: normalizeLinks(project.links),
     order: normalizeOrderValue(project.order, 0),
   };

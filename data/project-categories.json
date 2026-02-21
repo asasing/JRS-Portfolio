@@ -1,12 +1,12 @@
 [
   {
     "id": "cat-ai-automation",
-    "label": "AI & Automation",
+    "label": "AI",
     "order": 1
   },
   {
     "id": "cat-azure-cloud",
-    "label": "Azure Cloud",
+    "label": "Azure",
     "order": 2
   },
   {
@@ -16,12 +16,17 @@
   },
   {
     "id": "cat-power-platform",
-    "label": "Power Platform",
+    "label": "Power Platform & Dynamics 365",
     "order": 4
   },
   {
     "id": "cat-automation",
     "label": "Automation",
     "order": 5
+  },
+  {
+    "id": "cat-1771690673100-1",
+    "label": "API Integration",
+    "order": 6
   }
 ]

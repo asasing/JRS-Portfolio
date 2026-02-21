@@ -5,9 +5,12 @@
     "year": "2024",
     "organization": "Microsoft",
     "description": "Expert-level certification for end-to-end Power Platform solution architecture, Dataverse modeling, and enterprise governance.",
-    "credentialUrl": "#",
+    "credentialUrl": "",
     "badgeColor": "#8b5cf6",
-    "order": 1
+    "order": 1,
+    "credentialId": "",
+    "thumbnail": "/images/certifications/5fb59b77-1771693358226.png",
+    "paletteCode": "provider-cyan"
   },
   {
     "id": "cert-002",

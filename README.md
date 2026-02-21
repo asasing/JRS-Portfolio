@@ -47,6 +47,7 @@ Admin pages and related APIs:
 - `/admin/services` <-> `/api/services`
 - `/admin/projects` <-> `/api/projects`, `/api/project-categories`
 - `/admin/certifications` <-> `/api/certifications`
+- Reorder APIs: `/api/projects/reorder`, `/api/certifications/reorder`
 - Uploads via `/api/upload`
 - Contact form via `/api/contact`
 
@@ -60,3 +61,4 @@ Admin pages and related APIs:
 ## Notes
 - Tailwind-only styling (no Bootstrap).
 - Keep admin edit flow, API normalization, and public rendering aligned when adding fields.
+- Removed/replaced images are cleaned automatically when they are no longer referenced by data (protected placeholders are retained).

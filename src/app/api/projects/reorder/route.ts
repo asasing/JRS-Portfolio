@@ -12,11 +12,11 @@ function extractOrderIds(input: unknown): string[] {
   }
 
   return input
-    .map((item) =>
-      typeof item === "object" && item !== null && typeof item.id === "string"
-        ? item.id.trim()
-        : ""
-    )
+    .map((item) => {
+      if (typeof item !== "object" || item === null) return "";
+      const id = (item as { id?: unknown }).id;
+      return typeof id === "string" ? id.trim() : "";
+    })
     .filter(Boolean);
 }
 

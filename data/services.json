@@ -3,7 +3,7 @@
     "id": "svc-001",
     "number": "01/",
     "title": "Power Platform Development",
-    "description": "Building enterprise-grade apps and automations with Power Apps (Canvas & Model-Driven), Power Automate, Power Pages, and Dataverse — fully integrated with Microsoft 365 and 3rd Party APIs (if applicable).",
+    "description": "Building enterprise-grade apps and automations with Power Apps (Canvas & Model-Driven), Power Automate, Power Pages, and Dataverse \u2014 fully integrated with Microsoft 365 and 3rd Party APIs (if applicable).",
     "icon": "/images/services/eaa08ce3-1771521655333.png",
     "order": 1
   },
@@ -11,7 +11,7 @@
     "id": "svc-002",
     "number": "02/",
     "title": "AI & Intelligent Automation",
-    "description": "Designing AI-powered workflows using Azure AI Services, OpenAI/LLM integrations, Microsoft Copilot Studio, n8n, and RPA — reducing manual effort and enabling smarter business decisions.",
+    "description": "Designing AI-powered workflows using Azure AI Services, OpenAI/LLM integrations, Microsoft Copilot Studio, n8n, and RPA \u2014 reducing manual effort and enabling smarter business decisions.",
     "icon": "/images/services/724ad9ec-1771521662280.png",
     "order": 2
   },

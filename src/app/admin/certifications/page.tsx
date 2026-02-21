@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback } from "react";
 import { Certification } from "@/lib/types";
@@ -9,12 +9,29 @@ import Modal from "@/components/ui/Modal";
 import DeleteDialog from "@/components/admin/DeleteDialog";
 import ImageUploader from "@/components/admin/ImageUploader";
 import {
+  DndContext,
+  DragEndEvent,
+  KeyboardSensor,
+  PointerSensor,
+  closestCenter,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  arrayMove,
+  sortableKeyboardCoordinates,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
   CERTIFICATION_PALETTE_CODES,
   CERT_PROVIDER_PALETTES,
   resolvePaletteCodeFromProvider,
   sanitizePaletteCode,
 } from "@/lib/certification-palettes";
-import { FaPlus, FaEdit, FaTrash, FaTimes } from "react-icons/fa";
+import { FaPlus, FaEdit, FaTrash, FaTimes, FaGripVertical, FaSave } from "react-icons/fa";
 
 type CertificationFormState = Omit<Certification, "id">;
 
@@ -31,6 +48,62 @@ const emptyCert: CertificationFormState = {
   order: 0,
 };
 
+function reindexCerts(certs: Certification[]): Certification[] {
+  return certs.map((cert, index) => ({
+    ...cert,
+    order: index + 1,
+  }));
+}
+
+interface SortableCertificationRowProps {
+  cert: Certification;
+  onEdit: (cert: Certification) => void;
+  onDelete: (cert: Certification) => void;
+}
+
+function SortableCertificationRow({ cert, onEdit, onDelete }: SortableCertificationRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: cert.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-lg border border-border-subtle bg-bg-card px-4 py-3 ${
+        isDragging ? "opacity-70" : ""
+      }`}
+    >
+      <button
+        type="button"
+        aria-label="Drag to reorder certification"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-subtle text-text-muted hover:text-accent-purple cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <FaGripVertical size={12} />
+      </button>
+
+      <div>
+        <p className="text-sm font-medium text-text-primary">{cert.name}</p>
+        <p className="text-xs text-text-muted mt-1">{cert.organization} • {cert.year}</p>
+      </div>
+
+      <span className="text-xs text-text-muted">#{cert.order}</span>
+
+      <div className="flex items-center gap-3">
+        <button onClick={() => onEdit(cert)} className="text-text-muted hover:text-accent-purple transition-colors cursor-pointer"><FaEdit size={14} /></button>
+        <button onClick={() => onDelete(cert)} className="text-text-muted hover:text-accent-pink transition-colors cursor-pointer"><FaTrash size={14} /></button>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminCertifications() {
   const [certs, setCerts] = useState<Certification[]>([]);
   const [editing, setEditing] = useState<Certification | null>(null);
@@ -39,10 +112,24 @@ export default function AdminCertifications() {
   const [paletteManuallySet, setPaletteManuallySet] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState<Certification | null>(null);
   const [showForm, setShowForm] = useState(false);
+  const [orderDirty, setOrderDirty] = useState(false);
+  const [savingOrder, setSavingOrder] = useState(false);
+  const [orderSaved, setOrderSaved] = useState(false);
+
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: { distance: 8 },
+    }),
+    useSensor(KeyboardSensor, {
+      coordinateGetter: sortableKeyboardCoordinates,
+    })
+  );
 
   const fetchCerts = useCallback(async () => {
     const res = await fetch("/api/certifications");
-    setCerts(await res.json());
+    const data = await res.json();
+    setCerts(Array.isArray(data) ? data : []);
+    setOrderDirty(false);
   }, []);
 
   useEffect(() => {
@@ -98,6 +185,7 @@ export default function AdminCertifications() {
       credentialId: (formData.credentialId ?? "").trim(),
       thumbnail: (formData.thumbnail ?? "").trim(),
       paletteCode: sanitizePaletteCode(formData.paletteCode, formData.organization),
+      order: isNew ? certs.length + 1 : editing?.order ?? formData.order,
     };
 
     await fetch(url, {
@@ -117,6 +205,46 @@ export default function AdminCertifications() {
     void fetchCerts();
   };
 
+  const saveOrder = async () => {
+    setSavingOrder(true);
+    setOrderSaved(false);
+
+    const orderedIds = [...certs]
+      .sort((a, b) => a.order - b.order)
+      .map((cert) => cert.id);
+
+    const res = await fetch("/api/certifications/reorder", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderedIds),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      setCerts(Array.isArray(data) ? data : []);
+      setOrderDirty(false);
+      setOrderSaved(true);
+      setTimeout(() => setOrderSaved(false), 2000);
+    }
+
+    setSavingOrder(false);
+  };
+
+  const handleOrderDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const sorted = [...certs].sort((a, b) => a.order - b.order);
+    const oldIndex = sorted.findIndex((cert) => cert.id === active.id);
+    const newIndex = sorted.findIndex((cert) => cert.id === over.id);
+
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const reordered = arrayMove(sorted, oldIndex, newIndex);
+    setCerts(reindexCerts(reordered));
+    setOrderDirty(true);
+  };
+
   const sortedCerts = [...certs].sort((a, b) => a.order - b.order);
 
   return (
@@ -128,33 +256,36 @@ export default function AdminCertifications() {
         </Button>
       </div>
 
-      <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border-subtle">
-              <th className="text-left px-6 py-4 text-xs uppercase tracking-wider text-text-muted">Name</th>
-              <th className="text-left px-6 py-4 text-xs uppercase tracking-wider text-text-muted">Organization</th>
-              <th className="text-left px-6 py-4 text-xs uppercase tracking-wider text-text-muted">Year</th>
-              <th className="text-right px-6 py-4 text-xs uppercase tracking-wider text-text-muted">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedCerts.map((cert) => (
-              <tr key={cert.id} className="border-b border-border-subtle last:border-0 hover:bg-bg-card-hover transition-colors">
-                <td className="px-6 py-4 text-sm text-text-primary">{cert.name}</td>
-                <td className="px-6 py-4 text-sm text-text-secondary">{cert.organization}</td>
-                <td className="px-6 py-4 text-sm text-text-muted">{cert.year}</td>
-                <td className="px-6 py-4 text-right">
-                  <button onClick={() => openEdit(cert)} className="text-text-muted hover:text-accent-purple transition-colors mr-3 cursor-pointer"><FaEdit size={14} /></button>
-                  <button onClick={() => setDeleteTarget(cert)} className="text-text-muted hover:text-accent-pink transition-colors cursor-pointer"><FaTrash size={14} /></button>
-                </td>
-              </tr>
-            ))}
-            {certs.length === 0 && (
-              <tr><td colSpan={4} className="px-6 py-12 text-center text-text-muted">No certifications yet</td></tr>
-            )}
-          </tbody>
-        </table>
+      <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-text-primary">Certification Order</h2>
+          <div className="flex items-center gap-2">
+            {orderSaved && <span className="text-sm text-year-green">Saved!</span>}
+            <Button size="admin" onClick={saveOrder} disabled={savingOrder || !orderDirty}>
+              <span className="flex items-center gap-2">
+                <FaSave size={12} /> {savingOrder ? "Saving..." : "Save Certification Order"}
+              </span>
+            </Button>
+          </div>
+        </div>
+
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleOrderDragEnd}>
+          <SortableContext items={sortedCerts.map((cert) => cert.id)} strategy={verticalListSortingStrategy}>
+            <div className="space-y-2">
+              {sortedCerts.map((cert) => (
+                <SortableCertificationRow
+                  key={cert.id}
+                  cert={cert}
+                  onEdit={openEdit}
+                  onDelete={(item) => setDeleteTarget(item)}
+                />
+              ))}
+              {sortedCerts.length === 0 && (
+                <p className="text-sm text-text-muted">No certifications yet.</p>
+              )}
+            </div>
+          </SortableContext>
+        </DndContext>
       </div>
 
       <Modal isOpen={showForm} onClose={() => setShowForm(false)}>
@@ -232,8 +363,6 @@ export default function AdminCertifications() {
                 })}
               </div>
             </div>
-
-            <Input type="number" placeholder="Order" value={formData.order} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value, 10) || 0 })} />
 
             <div className="flex justify-end gap-3 pt-4">
               <Button size="admin" variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>

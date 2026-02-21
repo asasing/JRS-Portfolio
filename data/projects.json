@@ -1,5 +1,93 @@
 [
   {
+    "id": "proj-35de46d7",
+    "title": "SME Technology Services Company \u2013 Power Platform Enhancements",
+    "category": "Power Platform & Dynamics 365",
+    "categories": [
+      "Power Platform & Dynamics 365"
+    ],
+    "description": "<p>Power Apps | Power Automate | Business Process Automation <br><br>Delivered application enhancements and workflow optimizations within an existing Power Platform solution for a technology-focused SME. Responsibilities included: Implementing new feature requirements Fixing functional defects and logic issues Enhancing UI/UX components for improved usability Optimizing Power Automate flows to reduce manual effort Ensuring stability and alignment with business process needs The improvements increased operational efficiency and improved system reliability for internal users.</p>",
+    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [],
+    "links": [],
+    "order": 1
+  },
+  {
+    "id": "proj-113579f7",
+    "title": "Custom Online Store and Admin Dashboard",
+    "category": "AI",
+    "categories": [
+      "AI",
+      "API Integration",
+      "Custom App Development"
+    ],
+    "description": "<p>Designed and developed a modern e-commerce platform and internal admin dashboard for a multi-branch shoes and apparel brand. The solution streamlines online sales, inventory management, order processing, and business analytics into a centralized system</p>",
+    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [],
+    "links": [],
+    "order": 2
+  },
+  {
+    "id": "proj-002",
+    "title": "Dataverse to Azure SQL Migration",
+    "category": "Azure",
+    "categories": [
+      "Azure",
+      "Automation",
+      "Power Platform & Dynamics 365"
+    ],
+    "description": "Built a migration pipeline using Azure Data Factory and SQL scripts to sync 50K+ records, ensuring 99.9% data accuracy and reducing migration effort by 60%.",
+    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [],
+    "links": [],
+    "order": 3
+  },
+  {
+    "id": "proj-005",
+    "title": "AI Image and Caption Content Generator",
+    "category": "AI",
+    "categories": [
+      "AI",
+      "Automation",
+      "API Integration"
+    ],
+    "description": "<p>Built an n8n workflow integrating OpenAI GPT and image generation, and caption, for automated branded social media content creation. Reduced manual creative work by 70% and ensured consistent brand voice across platforms.</p>",
+    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [],
+    "links": [],
+    "order": 4
+  },
+  {
+    "id": "proj-004",
+    "title": "Project Engineers Checklist Automation",
+    "category": "Power Platform & Dynamics 365",
+    "categories": [
+      "Power Platform & Dynamics 365",
+      "API Integration",
+      "Automation"
+    ],
+    "description": "Designed and deployed a Canvas App with integrated Power Automate flows, reducing manual checklist processing time by 70% for an energy sector client.",
+    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [],
+    "links": [],
+    "order": 5
+  },
+  {
     "id": "proj-001",
     "title": "Power Pages AI Chatbot",
     "category": "AI",
@@ -16,97 +104,24 @@
     "thumbnailZoom": 1,
     "gallery": [],
     "links": [],
-    "order": 1
-  },
-  {
-    "id": "proj-002",
-    "title": "Dataverse to Azure SQL Migration",
-    "category": "Azure",
-    "categories": [
-      "Azure",
-      "Automation",
-      "Power Platform & Dynamics 365"
-    ],
-    "description": "Built a migration pipeline using Azure Data Factory and SQL scripts to sync 50K+ records, ensuring 99.9% data accuracy and reducing migration effort by 60%.",
-    "thumbnail": "/images/projects/placeholder-2.svg",
-    "thumbnailFocusX": 50,
-    "thumbnailFocusY": 50,
-    "thumbnailZoom": 1,
-    "gallery": [],
-    "links": [],
-    "order": 2
-  },
-  {
-    "id": "proj-003",
-    "title": "Bank Portal and Internal App Enhancement",
-    "category": "Custom App Development",
-    "categories": [
-      "Custom App Development"
-    ],
-    "description": "Customized Dynamics 365 (MDA) and Power Pages with Liquid, JavaScript, and API integrations — improving citizen service response time by 40% and streamlining submission workflows.",
-    "thumbnail": "/images/projects/placeholder-3.svg",
-    "thumbnailFocusX": 50,
-    "thumbnailFocusY": 50,
-    "thumbnailZoom": 1,
-    "gallery": [
-      "/images/projects/placeholder-3.svg",
-      "/images/projects/placeholder-1.svg"
-    ],
-    "links": [],
-    "order": 8
-  },
-  {
-    "id": "proj-004",
-    "title": "Project Engineers Checklist Automation",
-    "category": "Power Platform & Dynamics 365",
-    "categories": [
-      "Power Platform & Dynamics 365"
-    ],
-    "description": "Designed and deployed a Canvas App with integrated Power Automate flows, reducing manual checklist processing time by 70% for an energy sector client.",
-    "thumbnail": "/images/projects/placeholder-1.svg",
-    "thumbnailFocusX": 50,
-    "thumbnailFocusY": 50,
-    "thumbnailZoom": 1,
-    "gallery": [
-      "/images/projects/placeholder-1.svg"
-    ],
-    "links": [],
-    "order": 4
-  },
-  {
-    "id": "proj-005",
-    "title": "AI Image Content Generator",
-    "category": "AI",
-    "categories": [
-      "AI",
-      "Automation"
-    ],
-    "description": "Built an n8n workflow integrating OpenAI GPT and image generation for automated branded social media content creation. Reduced manual creative work by 70% and ensured consistent brand voice across platforms.",
-    "thumbnail": "/images/projects/placeholder-2.svg",
-    "thumbnailFocusX": 50,
-    "thumbnailFocusY": 50,
-    "thumbnailZoom": 1,
-    "gallery": [],
-    "links": [],
-    "order": 5
+    "order": 6
   },
   {
     "id": "proj-006",
     "title": "Automated Invoice Generator",
     "category": "Automation",
     "categories": [
-      "Automation"
+      "Automation",
+      "API Integration"
     ],
     "description": "Built an n8n + Google Apps Script pipeline to process OCR-based timesheets, auto-generate invoices, and email them to finance. Cut processing time from ~2 hours/week to under 10 minutes.",
-    "thumbnail": "/images/projects/placeholder-3.svg",
+    "thumbnail": "/images/projects/placeholder-1.svg",
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [
-      "/images/projects/placeholder-3.svg"
-    ],
+    "gallery": [],
     "links": [],
-    "order": 6
+    "order": 7
   },
   {
     "id": "proj-007",
@@ -120,26 +135,43 @@
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [
-      "/images/projects/placeholder-1.svg"
-    ],
+    "gallery": [],
     "links": [],
-    "order": 7
+    "order": 8
   },
   {
-    "id": "proj-35de46d7",
-    "title": "SME Technology Services Company – Power Platform Enhancements",
-    "category": "Power Platform & Dynamics 365",
+    "id": "proj-003",
+    "title": "Account Management & Employment System for Not-for-Profit Org",
+    "category": "Custom App Development",
     "categories": [
-      "Power Platform & Dynamics 365"
+      "Custom App Development"
     ],
-    "description": "<p>Power Apps | Power Automate | Business Process Automation <br><br>Delivered application enhancements and workflow optimizations within an existing Power Platform solution for a technology-focused SME. Responsibilities included: Implementing new feature requirements Fixing functional defects and logic issues Enhancing UI/UX components for improved usability Optimizing Power Automate flows to reduce manual effort Ensuring stability and alignment with business process needs The improvements increased operational efficiency and improved system reliability for internal users.</p>",
+    "description": "<p><strong>Sector:</strong> Workforce / Employer Engagement / Enterprise Operations<br><strong>Role:</strong> Senior Engineer &amp; Solution Architect<br><br>Led the design and implementation of a centralized Account Management and Employment tracking system to replace fragmented records and manual processes.</p><p>The solution provides structured tracking of organizations, employer engagement activities, participants, and employment outcomes \u2014 creating a single source of truth for operational reporting and governance.<br><br>Designed the full data model (core tables, relationships, normalized structure)</p><p>Defined governance strategy (ownership, security roles, DLP considerations)</p><ul><li><p>Ensured scalability for future integrations and reporting expansion<br><br><br>Impact</p><ul><li><p>Replaced manual spreadsheets with centralized system</p></li><li><p>Improved visibility of employer engagement lifecycle</p></li><li><p>Increased accountability via structured audit trails</p></li><li><p>Reduced operational friction and follow-up gaps</p></li></ul></li></ul><p></p>",
     "thumbnail": "/images/projects/placeholder-1.svg",
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
     "gallery": [],
     "links": [],
-    "order": 3
+    "order": 2
+  },
+  {
+    "id": "proj-17e6ea02",
+    "title": "Admin App for - Sales, Expense, Staff Management",
+    "category": "AI",
+    "categories": [
+      "AI",
+      "API Integration",
+      "Custom App Development",
+      "Automation"
+    ],
+    "description": "<p>Designed and built a centralized admin application initially focused on expense tracking, sales tracking, staff management, which evolved into a broader AI-enabled retail management for insights and reporting.</p>",
+    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [],
+    "links": [],
+    "order": 10
   }
 ]

@@ -1,13 +1,14 @@
-﻿"use client";
+"use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
+import Image from "next/image";
 import { Project, ProjectCategory } from "@/lib/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Modal from "@/components/ui/Modal";
 import DeleteDialog from "@/components/admin/DeleteDialog";
-import ImageUploader from "@/components/admin/ImageUploader";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import MultiImageUploader from "@/components/admin/MultiImageUploader";
 import {
   DndContext,
   DragEndEvent,
@@ -32,6 +33,8 @@ import {
   FaTimes,
   FaGripVertical,
   FaSave,
+  FaImage,
+  FaCheck,
 } from "react-icons/fa";
 import { DEFAULT_PROJECT_THUMBNAIL } from "@/lib/constants";
 
@@ -66,6 +69,46 @@ function normalizeFormCategories(categories: unknown, category: unknown): string
   return legacy ? [legacy] : [];
 }
 
+function dedupePaths(paths: string[]): string[] {
+  const seen = new Set<string>();
+  const unique: string[] = [];
+
+  for (const path of paths) {
+    const trimmed = path.trim();
+    if (!trimmed) continue;
+    const key = trimmed.toLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    unique.push(trimmed);
+  }
+
+  return unique;
+}
+
+function normalizeProjectMedia(gallery: string[], thumbnail: string): { gallery: string[]; thumbnail: string } {
+  const nextGallery = dedupePaths(gallery);
+  const cleanThumbnail = thumbnail.trim();
+
+  if (nextGallery.length === 0) {
+    return {
+      gallery: [],
+      thumbnail: cleanThumbnail || DEFAULT_PROJECT_THUMBNAIL,
+    };
+  }
+
+  if (cleanThumbnail && nextGallery.some((item) => item.toLowerCase() === cleanThumbnail.toLowerCase())) {
+    return {
+      gallery: nextGallery,
+      thumbnail: cleanThumbnail,
+    };
+  }
+
+  return {
+    gallery: nextGallery,
+    thumbnail: nextGallery[0],
+  };
+}
+
 function projectCategoryLabel(project: Project): string {
   const categories = normalizeFormCategories(project.categories, project.category);
   return categories.join(", ") || "-";
@@ -74,6 +117,13 @@ function projectCategoryLabel(project: Project): string {
 function reindexCategories(categories: ProjectCategory[]): ProjectCategory[] {
   return categories.map((category, index) => ({
     ...category,
+    order: index + 1,
+  }));
+}
+
+function reindexProjects(projects: Project[]): Project[] {
+  return projects.map((project, index) => ({
+    ...project,
     order: index + 1,
   }));
 }
@@ -136,6 +186,67 @@ function SortableCategoryRow({
   );
 }
 
+interface SortableProjectRowProps {
+  project: Project;
+  onEdit: (project: Project) => void;
+  onDelete: (project: Project) => void;
+}
+
+function SortableProjectRow({ project, onEdit, onDelete }: SortableProjectRowProps) {
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
+    id: project.id,
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+  };
+
+  return (
+    <div
+      ref={setNodeRef}
+      style={style}
+      className={`grid grid-cols-[auto_1fr_auto_auto] items-center gap-4 rounded-lg border border-border-subtle bg-bg-card px-4 py-3 ${
+        isDragging ? "opacity-70" : ""
+      }`}
+    >
+      <button
+        type="button"
+        aria-label="Drag to reorder project"
+        className="inline-flex h-9 w-9 items-center justify-center rounded-md border border-border-subtle text-text-muted hover:text-accent-purple cursor-grab active:cursor-grabbing"
+        {...attributes}
+        {...listeners}
+      >
+        <FaGripVertical size={12} />
+      </button>
+
+      <div>
+        <p className="text-sm font-medium text-text-primary">{project.title}</p>
+        <p className="text-xs text-text-muted mt-1">{projectCategoryLabel(project)}</p>
+      </div>
+
+      <span className="text-xs text-text-muted">#{project.order}</span>
+
+      <div className="flex items-center gap-3">
+        <button
+          type="button"
+          onClick={() => onEdit(project)}
+          className="text-text-muted hover:text-accent-purple transition-colors cursor-pointer"
+        >
+          <FaEdit size={14} />
+        </button>
+        <button
+          type="button"
+          onClick={() => onDelete(project)}
+          className="text-text-muted hover:text-accent-pink transition-colors cursor-pointer"
+        >
+          <FaTrash size={14} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function AdminProjects() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [projectCategories, setProjectCategories] = useState<ProjectCategory[]>([]);
@@ -147,6 +258,9 @@ export default function AdminProjects() {
   const [savingCategories, setSavingCategories] = useState(false);
   const [categoriesSaved, setCategoriesSaved] = useState(false);
   const [categoriesDirty, setCategoriesDirty] = useState(false);
+  const [savingProjectOrder, setSavingProjectOrder] = useState(false);
+  const [projectOrderSaved, setProjectOrderSaved] = useState(false);
+  const [projectOrderDirty, setProjectOrderDirty] = useState(false);
   const categoryIdCounter = useRef(0);
 
   const sensors = useSensors(
@@ -167,6 +281,7 @@ export default function AdminProjects() {
     const res = await fetch("/api/projects");
     const data = await res.json();
     setProjects(Array.isArray(data) ? data : []);
+    setProjectOrderDirty(false);
   }, []);
 
   const fetchProjectCategories = useCallback(async () => {
@@ -183,12 +298,20 @@ export default function AdminProjects() {
   const openNew = () => {
     setEditing(null);
     setIsNew(true);
-    setFormData({ ...emptyProject, order: projects.length + 1, categories: [], category: "" });
+    setFormData({
+      ...emptyProject,
+      order: projects.length + 1,
+      categories: [],
+      category: "",
+      gallery: [],
+      thumbnail: DEFAULT_PROJECT_THUMBNAIL,
+    });
     setShowForm(true);
   };
 
   const openEdit = (project: Project) => {
     const normalizedCategories = normalizeFormCategories(project.categories, project.category);
+    const normalizedMedia = normalizeProjectMedia(project.gallery, project.thumbnail || "");
 
     setEditing(project);
     setIsNew(false);
@@ -197,17 +320,11 @@ export default function AdminProjects() {
       category: normalizedCategories[0] || "",
       categories: normalizedCategories,
       description: project.description,
-      thumbnail: project.thumbnail,
-      thumbnailFocusX: Number.isFinite(project.thumbnailFocusX)
-        ? Math.min(100, Math.max(0, Number(project.thumbnailFocusX)))
-        : 50,
-      thumbnailFocusY: Number.isFinite(project.thumbnailFocusY)
-        ? Math.min(100, Math.max(0, Number(project.thumbnailFocusY)))
-        : 50,
-      thumbnailZoom: Number.isFinite(project.thumbnailZoom)
-        ? Math.min(3, Math.max(1, Number(project.thumbnailZoom)))
-        : 1,
-      gallery: project.gallery,
+      thumbnail: normalizedMedia.thumbnail,
+      thumbnailFocusX: 50,
+      thumbnailFocusY: 50,
+      thumbnailZoom: 1,
+      gallery: normalizedMedia.gallery,
       links: project.links,
       order: project.order,
     });
@@ -242,15 +359,44 @@ export default function AdminProjects() {
     setSavingCategories(false);
   };
 
+  const saveProjectOrder = async () => {
+    setSavingProjectOrder(true);
+    setProjectOrderSaved(false);
+
+    const orderedIds = [...projects]
+      .sort((a, b) => a.order - b.order)
+      .map((project) => project.id);
+
+    const res = await fetch("/api/projects/reorder", {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderedIds),
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      setProjects(Array.isArray(data) ? data : []);
+      setProjectOrderDirty(false);
+      setProjectOrderSaved(true);
+      setTimeout(() => setProjectOrderSaved(false), 2000);
+    }
+
+    setSavingProjectOrder(false);
+  };
+
   const handleSave = async () => {
     const url = isNew ? "/api/projects" : `/api/projects/${editing!.id}`;
     const method = isNew ? "POST" : "PUT";
     const categories = normalizeFormCategories(formData.categories, formData.category);
+    const media = normalizeProjectMedia(formData.gallery, formData.thumbnail || "");
+
     const payload = {
       ...formData,
       categories,
       category: categories[0] || "",
-      thumbnail: formData.thumbnail?.trim() || DEFAULT_PROJECT_THUMBNAIL,
+      gallery: media.gallery,
+      thumbnail: media.thumbnail,
+      order: isNew ? projects.length + 1 : editing?.order ?? formData.order,
     };
 
     await fetch(url, {
@@ -276,10 +422,6 @@ export default function AdminProjects() {
 
   const removeLink = (i: number) => {
     setFormData({ ...formData, links: formData.links.filter((_, idx) => idx !== i) });
-  };
-
-  const addGalleryImage = () => {
-    setFormData({ ...formData, gallery: [...formData.gallery, ""] });
   };
 
   const toggleProjectCategory = (label: string) => {
@@ -389,6 +531,57 @@ export default function AdminProjects() {
     setCategoriesDirty(true);
   };
 
+  const handleProjectDragEnd = (event: DragEndEvent) => {
+    const { active, over } = event;
+    if (!over || active.id === over.id) return;
+
+    const sortedProjects = [...projects].sort((a, b) => a.order - b.order);
+    const oldIndex = sortedProjects.findIndex((project) => project.id === active.id);
+    const newIndex = sortedProjects.findIndex((project) => project.id === over.id);
+
+    if (oldIndex < 0 || newIndex < 0) return;
+
+    const reordered = arrayMove(sortedProjects, oldIndex, newIndex);
+    setProjects(reindexProjects(reordered));
+    setProjectOrderDirty(true);
+  };
+
+  const appendGalleryImages = (paths: string[]) => {
+    setFormData((prev) => {
+      const merged = dedupePaths([...prev.gallery, ...paths]);
+      const hasValidThumbnail = merged.some(
+        (item) => item.toLowerCase() === (prev.thumbnail || "").trim().toLowerCase()
+      );
+
+      return {
+        ...prev,
+        gallery: merged,
+        thumbnail: hasValidThumbnail ? prev.thumbnail : merged[0] || DEFAULT_PROJECT_THUMBNAIL,
+      };
+    });
+  };
+
+  const setThumbnailFromGallery = (path: string) => {
+    setFormData((prev) => ({ ...prev, thumbnail: path }));
+  };
+
+  const removeGalleryImage = (index: number) => {
+    setFormData((prev) => {
+      const removed = prev.gallery[index];
+      const nextGallery = prev.gallery.filter((_, idx) => idx !== index);
+      const nextThumbnail =
+        removed === prev.thumbnail
+          ? nextGallery[0] || DEFAULT_PROJECT_THUMBNAIL
+          : prev.thumbnail;
+
+      return {
+        ...prev,
+        gallery: nextGallery,
+        thumbnail: nextThumbnail,
+      };
+    });
+  };
+
   const sortedProjectCategories = [...projectCategories].sort((a, b) => a.order - b.order);
   const sortedProjects = [...projects].sort((a, b) => a.order - b.order);
 
@@ -449,37 +642,47 @@ export default function AdminProjects() {
         </DndContext>
       </div>
 
-      <div className="bg-bg-card border border-border-subtle rounded-xl overflow-hidden">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-border-subtle">
-              <th className="text-left px-6 py-4 text-xs uppercase tracking-wider text-text-muted">Title</th>
-              <th className="text-left px-6 py-4 text-xs uppercase tracking-wider text-text-muted">Category</th>
-              <th className="text-left px-6 py-4 text-xs uppercase tracking-wider text-text-muted">Order</th>
-              <th className="text-right px-6 py-4 text-xs uppercase tracking-wider text-text-muted">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {sortedProjects.map((project) => (
-              <tr key={project.id} className="border-b border-border-subtle last:border-0 hover:bg-bg-card-hover transition-colors">
-                <td className="px-6 py-4 text-sm text-text-primary">{project.title}</td>
-                <td className="px-6 py-4 text-sm text-text-secondary">{projectCategoryLabel(project)}</td>
-                <td className="px-6 py-4 text-sm text-text-muted">{project.order}</td>
-                <td className="px-6 py-4 text-right">
-                  <button onClick={() => openEdit(project)} className="text-text-muted hover:text-accent-purple transition-colors mr-3 cursor-pointer">
-                    <FaEdit size={14} />
-                  </button>
-                  <button onClick={() => setDeleteTarget(project)} className="text-text-muted hover:text-accent-pink transition-colors cursor-pointer">
-                    <FaTrash size={14} />
-                  </button>
-                </td>
-              </tr>
-            ))}
-            {projects.length === 0 && (
-              <tr><td colSpan={4} className="px-6 py-12 text-center text-text-muted">No projects yet</td></tr>
-            )}
-          </tbody>
-        </table>
+      <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <h2 className="text-lg font-semibold text-text-primary">Project Order</h2>
+          <div className="flex items-center gap-2">
+            {projectOrderSaved && <span className="text-sm text-year-green">Saved!</span>}
+            <Button
+              size="admin"
+              onClick={saveProjectOrder}
+              disabled={savingProjectOrder || !projectOrderDirty}
+            >
+              <span className="flex items-center gap-2">
+                <FaSave size={12} /> {savingProjectOrder ? "Saving..." : "Save Project Order"}
+              </span>
+            </Button>
+          </div>
+        </div>
+
+        <DndContext
+          sensors={sensors}
+          collisionDetection={closestCenter}
+          onDragEnd={handleProjectDragEnd}
+        >
+          <SortableContext
+            items={sortedProjects.map((project) => project.id)}
+            strategy={verticalListSortingStrategy}
+          >
+            <div className="space-y-2">
+              {sortedProjects.map((project) => (
+                <SortableProjectRow
+                  key={project.id}
+                  project={project}
+                  onEdit={openEdit}
+                  onDelete={(item) => setDeleteTarget(item)}
+                />
+              ))}
+              {sortedProjects.length === 0 && (
+                <p className="text-sm text-text-muted">No projects yet.</p>
+              )}
+            </div>
+          </SortableContext>
+        </DndContext>
       </div>
 
       <Modal isOpen={showForm} onClose={() => setShowForm(false)}>
@@ -492,10 +695,7 @@ export default function AdminProjects() {
           </div>
 
           <div className="space-y-4">
-            <div className="grid grid-cols-2 gap-4">
-              <Input placeholder="Title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
-              <Input type="number" placeholder="Order" value={formData.order} onChange={(e) => setFormData({ ...formData, order: parseInt(e.target.value, 10) || 0 })} />
-            </div>
+            <Input placeholder="Title" value={formData.title} onChange={(e) => setFormData({ ...formData, title: e.target.value })} />
 
             <div>
               <label className="block text-sm text-text-muted mb-2 uppercase tracking-wider">Categories</label>
@@ -534,52 +734,64 @@ export default function AdminProjects() {
               onChange={(html) => setFormData({ ...formData, description: html })}
             />
 
-            <ImageUploader
-              label="Thumbnail"
-              value={formData.thumbnail}
-              enablePositioning
-              focusX={formData.thumbnailFocusX}
-              focusY={formData.thumbnailFocusY}
-              zoom={formData.thumbnailZoom}
-              onFocusChange={(x, y, zoom) =>
-                setFormData({ ...formData, thumbnailFocusX: x, thumbnailFocusY: y, thumbnailZoom: zoom })
-              }
-              onChange={(path) =>
-                setFormData({
-                  ...formData,
-                  thumbnail: path,
-                  ...(path ? {} : { thumbnailFocusX: 50, thumbnailFocusY: 50, thumbnailZoom: 1 }),
-                })
-              }
+            <MultiImageUploader
+              label="Project Images"
+              category="projects"
+              onUploadComplete={appendGalleryImages}
             />
 
             <div>
-              <div className="flex items-center justify-between mb-2">
-                <label className="text-sm text-text-muted">Gallery Images</label>
-                <button type="button" onClick={addGalleryImage} className="text-xs text-accent-purple hover:text-accent-magenta cursor-pointer">+ Add Image</button>
-              </div>
-              <div className="space-y-3">
-                {formData.gallery.map((img, i) => (
-                  <div key={i} className="border border-border-subtle rounded-xl p-3">
-                    <ImageUploader
-                      label={`Gallery Image ${i + 1}`}
-                      value={img}
-                      onChange={(path) => {
-                        const gallery = [...formData.gallery];
-                        gallery[i] = path;
-                        setFormData({ ...formData, gallery });
-                      }}
-                    />
-                    <button
-                      type="button"
-                      onClick={() => setFormData({ ...formData, gallery: formData.gallery.filter((_, idx) => idx !== i) })}
-                      className="mt-3 text-sm text-text-muted hover:text-accent-pink cursor-pointer"
-                    >
-                      Remove Image
-                    </button>
-                  </div>
-                ))}
-              </div>
+              <label className="block text-sm text-text-muted mb-2">Gallery and Thumbnail Selection</label>
+              {formData.gallery.length === 0 ? (
+                <p className="rounded-lg border border-border-subtle bg-bg-input px-4 py-3 text-sm text-text-muted">
+                  Upload images above to build gallery and choose a thumbnail.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {formData.gallery.map((path, index) => {
+                    const isThumbnail = path === formData.thumbnail;
+
+                    return (
+                      <div key={`${path}-${index}`} className="rounded-xl border border-border-subtle bg-bg-input p-3">
+                        <div className="relative aspect-video w-full overflow-hidden rounded-lg border border-border-subtle bg-bg-card">
+                          <Image
+                            src={path}
+                            alt={`Project image ${index + 1}`}
+                            fill
+                            className="object-contain"
+                            sizes="(max-width: 768px) 100vw, 50vw"
+                          />
+                        </div>
+
+                        <div className="mt-3 flex items-center justify-between gap-2">
+                          <button
+                            type="button"
+                            onClick={() => setThumbnailFromGallery(path)}
+                            className={`inline-flex items-center gap-2 rounded-full px-3 py-2 text-xs transition-colors cursor-pointer ${
+                              isThumbnail
+                                ? "bg-accent-purple text-white"
+                                : "border border-border-subtle text-text-muted hover:text-accent-purple hover:border-accent-purple"
+                            }`}
+                          >
+                            {isThumbnail ? <FaCheck size={11} /> : <FaImage size={11} />}
+                            {isThumbnail ? "Thumbnail" : "Set as Thumbnail"}
+                          </button>
+
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryImage(index)}
+                            className="text-xs text-text-muted hover:text-accent-pink cursor-pointer"
+                          >
+                            Remove
+                          </button>
+                        </div>
+
+                        <p className="mt-2 truncate text-[11px] text-text-muted">{path}</p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
             </div>
 
             <div>
@@ -625,4 +837,3 @@ export default function AdminProjects() {
     </div>
   );
 }
-

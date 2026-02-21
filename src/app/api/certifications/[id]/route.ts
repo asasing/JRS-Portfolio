@@ -3,6 +3,7 @@ import { readJsonFile, writeJsonFile } from "@/lib/data";
 import { authenticateRequest } from "@/lib/api-auth";
 import { Certification } from "@/lib/types";
 import { sanitizePaletteCode } from "@/lib/certification-palettes";
+import { removeImagesIfUnused } from "@/lib/media-cleanup";
 
 function normalizeCredentialUrl(url: unknown): string {
   if (typeof url !== "string") return "";
@@ -53,6 +54,8 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
+  const previousThumbnail = normalizeThumbnailPath(certs[index].thumbnail);
+
   certs[index] = {
     ...certs[index],
     ...body,
@@ -75,6 +78,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     ),
   };
   await writeJsonFile("certifications.json", certs);
+  void removeImagesIfUnused([previousThumbnail]);
 
   return NextResponse.json(certs[index]);
 }
@@ -86,6 +90,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   const { id } = await params;
   const certs = await readJsonFile<Certification[]>("certifications.json");
+  const target = certs.find((c) => c.id === id);
   const filtered = certs.filter((c) => c.id !== id);
 
   if (filtered.length === certs.length) {
@@ -93,5 +98,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   }
 
   await writeJsonFile("certifications.json", filtered);
+  if (target) {
+    void removeImagesIfUnused([normalizeThumbnailPath(target.thumbnail)]);
+  }
   return NextResponse.json({ success: true });
 }

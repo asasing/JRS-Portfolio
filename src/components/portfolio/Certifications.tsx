@@ -62,14 +62,14 @@ function CertCard({ cert }: { cert: Certification }) {
             event.stopPropagation();
             setShowImagePreview(true);
           }}
-          className="mb-4 relative aspect-video w-full overflow-hidden rounded-xl border border-border-subtle cursor-zoom-in"
+          className="mb-4 relative h-44 w-full overflow-hidden rounded-xl border border-border-subtle bg-bg-primary cursor-zoom-in"
           aria-label={`Preview certification image for ${cert.name}`}
         >
           <Image
             src={thumbnail}
             alt={`${cert.name} thumbnail`}
             fill
-            className="object-cover transition-transform duration-500 hover:scale-105"
+            className="object-contain transition-transform duration-500 hover:scale-105"
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         </button>

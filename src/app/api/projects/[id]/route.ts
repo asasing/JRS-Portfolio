@@ -3,6 +3,14 @@ import { readJsonFile, writeJsonFile } from "@/lib/data";
 import { authenticateRequest } from "@/lib/api-auth";
 import { Project } from "@/lib/types";
 import { normalizeProject } from "@/lib/project-normalizers";
+import { removeImagesIfUnused } from "@/lib/media-cleanup";
+
+function projectImageCandidates(project: Project): string[] {
+  const paths: string[] = [];
+  if (typeof project.thumbnail === "string") paths.push(project.thumbnail);
+  if (Array.isArray(project.gallery)) paths.push(...project.gallery);
+  return paths;
+}
 
 export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -30,10 +38,13 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  projects[index] = normalizeProject({ ...projects[index], ...body, id });
+  const before = projects[index];
+  const next = normalizeProject({ ...before, ...body, id });
+  projects[index] = next;
   await writeJsonFile("projects.json", projects);
+  void removeImagesIfUnused(projectImageCandidates(before));
 
-  return NextResponse.json(projects[index]);
+  return NextResponse.json(next);
 }
 
 export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
@@ -43,6 +54,7 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
 
   const { id } = await params;
   const projects = await readJsonFile<Project[]>("projects.json");
+  const target = projects.find((p) => p.id === id);
   const filtered = projects.filter((p) => p.id !== id);
 
   if (filtered.length === projects.length) {
@@ -50,5 +62,8 @@ export async function DELETE(req: NextRequest, { params }: { params: Promise<{ i
   }
 
   await writeJsonFile("projects.json", filtered);
+  if (target) {
+    void removeImagesIfUnused(projectImageCandidates(target));
+  }
   return NextResponse.json({ success: true });
 }

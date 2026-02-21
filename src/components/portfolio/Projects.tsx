@@ -36,6 +36,7 @@ function matchesCategory(project: Project, category: string): boolean {
 export default function Projects({ projects, projectCategories }: ProjectsProps) {
   const [activeCategory, setActiveCategory] = useState("All");
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [viewMode, setViewMode] = useState<"rail" | "grid">("rail");
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(false);
   const desktopRailRef = useRef<HTMLDivElement>(null);
@@ -149,6 +150,13 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
       <div className="site-container">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10 md:mb-12">
           <SectionHeading overline="PORTFOLIO" title="Recent Works" gradientWord="Works" />
+          <button
+            type="button"
+            onClick={() => setViewMode((prev) => (prev === "rail" ? "grid" : "rail"))}
+            className="pill-button border border-border-subtle text-xs sm:text-sm text-text-secondary hover:text-text-primary hover:border-accent-purple/50 transition-colors cursor-pointer self-start md:self-auto"
+          >
+            {viewMode === "rail" ? "Expand" : "Shrink"}
+          </button>
         </div>
 
         <div className="flex flex-wrap gap-2 sm:gap-3 mb-8 md:mb-10">
@@ -167,28 +175,23 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
           ))}
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:hidden">
-          {filteredProjects.map((project) => (
-            <ProjectCard
-              key={`mobile-${project.id}`}
-              project={project}
-              onClick={() => setSelectedProject(project)}
-            />
-          ))}
-        </div>
-
-        <div className="relative hidden lg:block">
-          <div
-            ref={desktopRailRef}
-            className="overflow-x-auto scroll-smooth pb-2"
-            onWheel={handleRailWheel}
-          >
-            <div className="flex gap-6 w-max pr-2">
+        {viewMode === "grid" ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProjects.map((project) => (
+              <ProjectCard
+                key={`grid-${project.id}`}
+                project={project}
+                onClick={() => setSelectedProject(project)}
+              />
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:hidden">
               {filteredProjects.map((project) => (
                 <div
-                  key={`desktop-${project.id}`}
-                  data-project-card="true"
-                  className="min-w-[340px] xl:min-w-[360px] 2xl:min-w-[380px] h-full"
+                  key={`mobile-${project.id}`}
+                  className="h-full"
                 >
                   <ProjectCard
                     project={project}
@@ -197,25 +200,48 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
                 </div>
               ))}
             </div>
-          </div>
 
-          <div className="pointer-events-none absolute inset-y-0 left-0 right-0 hidden items-center justify-between lg:flex">
-            <button
-              onClick={() => scrollByCard(-1)}
-              disabled={!canScrollLeft}
-              className="pointer-events-auto ml-1 h-11 w-11 rounded-full border border-border-subtle bg-black/55 backdrop-blur-sm flex items-center justify-center text-text-secondary hover:text-accent-purple hover:border-accent-purple transition-colors disabled:opacity-30 disabled:cursor-default cursor-pointer"
-            >
-              <FaChevronLeft size={14} />
-            </button>
-            <button
-              onClick={() => scrollByCard(1)}
-              disabled={!canScrollRight}
-              className="pointer-events-auto mr-1 h-11 w-11 rounded-full border border-border-subtle bg-black/55 backdrop-blur-sm flex items-center justify-center text-text-secondary hover:text-accent-purple hover:border-accent-purple transition-colors disabled:opacity-30 disabled:cursor-default cursor-pointer"
-            >
-              <FaChevronRight size={14} />
-            </button>
-          </div>
-        </div>
+            <div className="relative hidden lg:block">
+              <div
+                ref={desktopRailRef}
+                className="overflow-x-auto scroll-smooth pb-2"
+                onWheel={handleRailWheel}
+              >
+                <div className="flex gap-6 w-max pr-2">
+                  {filteredProjects.map((project) => (
+                    <div
+                      key={`desktop-${project.id}`}
+                      data-project-card="true"
+                      className="min-w-[340px] xl:min-w-[360px] 2xl:min-w-[380px] h-full"
+                    >
+                      <ProjectCard
+                        project={project}
+                        onClick={() => setSelectedProject(project)}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              <div className="pointer-events-none absolute inset-y-0 left-0 right-0 hidden items-center justify-between lg:flex">
+                <button
+                  onClick={() => scrollByCard(-1)}
+                  disabled={!canScrollLeft}
+                  className="pointer-events-auto ml-1 h-11 w-11 rounded-full border border-border-subtle bg-black/55 backdrop-blur-sm flex items-center justify-center text-text-secondary hover:text-accent-purple hover:border-accent-purple transition-colors disabled:opacity-30 disabled:cursor-default cursor-pointer"
+                >
+                  <FaChevronLeft size={14} />
+                </button>
+                <button
+                  onClick={() => scrollByCard(1)}
+                  disabled={!canScrollRight}
+                  className="pointer-events-auto mr-1 h-11 w-11 rounded-full border border-border-subtle bg-black/55 backdrop-blur-sm flex items-center justify-center text-text-secondary hover:text-accent-purple hover:border-accent-purple transition-colors disabled:opacity-30 disabled:cursor-default cursor-pointer"
+                >
+                  <FaChevronRight size={14} />
+                </button>
+              </div>
+            </div>
+          </>
+        )}
 
         {filteredProjects.length === 0 && (
           <div className="mt-6 rounded-xl border border-border-subtle bg-bg-card px-6 py-8 text-sm text-text-muted">
@@ -239,12 +265,6 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
   const safeThumbnail = project.thumbnail?.trim() || DEFAULT_PROJECT_THUMBNAIL;
   const projectCategories = getProjectCategories(project);
   const categoryLabel = projectCategories.join(" • ");
-  const focusX = Number.isFinite(project.thumbnailFocusX) ? Number(project.thumbnailFocusX) : 50;
-  const focusY = Number.isFinite(project.thumbnailFocusY) ? Number(project.thumbnailFocusY) : 50;
-  const zoom = Number.isFinite(project.thumbnailZoom) ? Number(project.thumbnailZoom) : 1;
-  const safeFocusX = Math.min(100, Math.max(0, focusX));
-  const safeFocusY = Math.min(100, Math.max(0, focusY));
-  const safeZoom = Math.min(3, Math.max(1, zoom));
 
   return (
     <div
@@ -260,12 +280,7 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
             src={safeThumbnail}
             alt={project.title}
             fill
-            className="object-cover"
-            style={{
-              objectPosition: `${safeFocusX}% ${safeFocusY}%`,
-              transform: `scale(${safeZoom})`,
-              transformOrigin: "center",
-            }}
+            className="object-contain"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />
         </div>

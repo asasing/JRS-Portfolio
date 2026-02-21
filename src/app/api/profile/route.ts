@@ -3,6 +3,7 @@ import { readJsonFile, writeJsonFile } from "@/lib/data";
 import { authenticateRequest } from "@/lib/api-auth";
 import { Profile } from "@/lib/types";
 import { normalizeProfileData } from "@/lib/profile-normalizers";
+import { removeImagesIfUnused } from "@/lib/media-cleanup";
 
 export async function GET() {
   const profile = await readJsonFile<Partial<Profile>>("profile.json");
@@ -19,5 +20,8 @@ export async function PUT(req: NextRequest) {
   const profile = normalizeProfileData({ ...current, ...incoming });
 
   await writeJsonFile("profile.json", profile);
+  if (current.profilePhoto && current.profilePhoto !== profile.profilePhoto) {
+    void removeImagesIfUnused([current.profilePhoto]);
+  }
   return NextResponse.json(profile);
 }

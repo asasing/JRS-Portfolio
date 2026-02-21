@@ -210,12 +210,14 @@ Supported icon source values:
 ### Projects
 ```
 [Managed category chips, multi-category filter]
-[Cards grid on mobile/tablet]
+[Rail default + Expand/Shrink toggle]
+[Cards grid on mobile/tablet and expanded desktop view]
 [Native horizontal rail on desktop with overlay edge arrows]
 ```
 
 - Filter chips are driven by admin-managed project categories (`project-categories.json`).
 - Clicking an already active category toggles back to `All`.
+- View mode defaults to horizontal rail; `Expand` switches to grid and `Shrink` restores rail mode.
 - Desktop rail supports native horizontal scroll (trackpad/wheel/swipe) plus left/right overlay controls.
 - Recent Works cards keep uniform rhythm:
 - fixed media ratio (`aspect-[4/3]`)
@@ -230,6 +232,7 @@ Supported icon source values:
 ```
 Responsive card grid with neutral year badge, provider palette accents, optional credential ID/link, and optional thumbnail with image preview
 ```
+- Certification thumbnails use contained-fit rendering (`object-contain`) inside a fixed-height media area to keep card heights stable.
 
 ### Contact
 ```
@@ -277,6 +280,9 @@ Anchors: `#about`, `#services`, `#portfolio`, `#certifications`, `#contact`.
 - Same dark token system as portfolio.
 - Shared form controls and button component.
 - Table/list rows use subtle hover feedback.
+- Projects and certifications ordering use drag-and-drop rows with explicit `Save Order` actions.
+- Project media management is gallery-first with multi-upload and thumbnail selection from uploaded gallery images.
+- Media lifecycle policy: when image references are removed in admin data, unreferenced files are automatically cleaned from `public/images` (default placeholders are protected).
 
 ---
 

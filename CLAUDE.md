@@ -37,7 +37,8 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Upload endpoint: `POST /api/upload` (`src/app/api/upload/route.ts`)
 - Accepts image files and `category` form field
 - Stores files under `public/images/<category>`
-- Current policy: do **not** auto-delete replaced/removed files
+- Current policy: removed/replaced image files are cleaned up when they are no longer referenced by `data/*.json`
+- Cleanup helper: `src/lib/media-cleanup.ts`
 
 ## Contact Form Email
 - Route: `src/app/api/contact/route.ts`
@@ -71,8 +72,8 @@ It documents architecture, data flow, key decisions, and recent changes implemen
   - optional manual path input
 - Applied to:
   - profile photo in admin profile
-  - project thumbnail
-  - project gallery rows (gallery is now uploader-first, not text-only)
+  - project/certification media flows
+  - project gallery-first upload and thumbnail selection
 
 2. Auto-calculate years of experience
 - Added `experienceStartYear` to `Profile`
@@ -119,6 +120,13 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Admin certifications includes palette selector (auto by provider + manual override) and single thumbnail upload.
 - Public certification cards show credential ID when present and support thumbnail click-to-preview.
 
+10. Reorder + media UX upgrades (projects/certifications)
+- Admin projects now support multi-image upload and thumbnail selection from gallery images.
+- Admin project ordering and certification ordering are drag-and-drop with explicit save actions.
+- Added bulk reorder APIs: `/api/projects/reorder` and `/api/certifications/reorder`.
+- Public Recent Works includes `Expand`/`Shrink` view mode (rail <-> grid).
+- Public project and certification thumbnail cards use contained-fit image rendering to avoid crop and keep stable card height.
+
 ## Important Files Touched Recently
 - `src/app/globals.css`
 - `src/components/portfolio/Services.tsx`
@@ -127,6 +135,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `src/components/portfolio/ProjectDetail.tsx`
 - `src/components/ui/Button.tsx`
 - `src/components/admin/ImageUploader.tsx`
+- `src/components/admin/MultiImageUploader.tsx`
 - `src/components/admin/RichTextEditor.tsx`
 - `src/app/admin/profile/page.tsx`
 - `src/app/admin/projects/page.tsx`
@@ -138,15 +147,18 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `src/app/api/profile/route.ts`
 - `src/app/api/projects/route.ts`
 - `src/app/api/projects/[id]/route.ts`
+- `src/app/api/projects/reorder/route.ts`
 - `src/app/api/project-categories/route.ts`
 - `src/app/api/contact/route.ts`
 - `src/app/api/certifications/route.ts`
 - `src/app/api/certifications/[id]/route.ts`
+- `src/app/api/certifications/reorder/route.ts`
 - `src/lib/types.ts`
 - `src/lib/certification-palettes.ts`
 - `src/lib/project-normalizers.ts`
 - `src/lib/project-category-normalizers.ts`
 - `src/lib/contact-message-normalizers.ts`
+- `src/lib/media-cleanup.ts`
 - `data/profile.json`
 - `data/projects.json`
 - `data/project-categories.json`
@@ -168,8 +180,9 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 ## Practical Notes for Future Sessions
 - Prefer JSON/API consistency over direct file edits from UI assumptions.
 - For admin media features, reuse `ImageUploader` and `/api/upload` first.
+- Media cleanup is automatic on profile/projects/services/certifications update/delete routes; do not rely on manual file pruning.
 - For profile changes, ensure `src/lib/types.ts`, `data/profile.json`, admin UI, and `/api/profile` stay aligned.
-- Preserve current decision: keep uploaded file history (no automatic deletion on replace/remove).
+- Preserve protected default assets (`/images/projects/placeholder-*.svg`, `/images/profile/photo.svg`).
 
 ## Change Log
 ### 2026-02-19 (UI Spacing and Typography Pass)
@@ -219,6 +232,23 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Fixed project category separator rendering to proper bullet (`•`) in modal and cards.
 - Replaced boilerplate `README.md` with project-specific runbook, env semantics, and feature/data map.
 - Added repo-local skill `.codex/skills/portfolio-maintainer` with references for architecture, data contracts, UI rules, and release checklist.
+
+### 2026-02-21 (Projects/Certifications Media + Reorder UX)
+- Added `MultiImageUploader` and switched admin projects to gallery-first multi-image upload.
+- Added thumbnail picker from project gallery with safe fallback when thumbnail image is removed.
+- Added drag-and-drop ordering with explicit save for projects and certifications.
+- Added reorder APIs: `PUT /api/projects/reorder` and `PUT /api/certifications/reorder`.
+- Added Recent Works `Expand`/`Shrink` mode to switch between horizontal rail and grid layouts.
+- Updated project and certification thumbnails to use full image contain-fit in fixed media containers.
+
+### 2026-02-21 (Media Cleanup Policy Update)
+- Added `src/lib/media-cleanup.ts` to detect references across profile/projects/services/certifications and rich HTML image sources.
+- Wired cleanup calls into API write/delete routes:
+  - `src/app/api/profile/route.ts`
+  - `src/app/api/projects/[id]/route.ts`
+  - `src/app/api/services/route.ts`
+  - `src/app/api/certifications/[id]/route.ts`
+- Executed one-time orphan cleanup and sanitized data references to avoid broken image paths.
 
 ### Template For Next Entries
 - `YYYY-MM-DD`

@@ -32,7 +32,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Authentication: Supabase Auth (email + password)
 - Login API: `src/app/api/auth/login/route.ts` — calls `supabase.auth.signInWithPassword()`
 - Logout API: `src/app/api/auth/logout/route.ts` — calls `supabase.auth.signOut()`
-- Middleware protection: `src/proxy.ts` — verifies Supabase session via `supabase.auth.getUser()`
+- Middleware protection: `src/middleware.ts` — verifies Supabase session via `supabase.auth.getUser()`
 - API auth: `src/lib/api-auth.ts` — `authenticateRequest()` verifies Supabase session (no args needed)
 - Browser client: `src/lib/supabase-browser.ts` — used by client components
 - Server auth client: `createSupabaseServerClient()` in `src/lib/supabase.ts` — cookie-based server client
@@ -48,11 +48,13 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Cleanup helper: `src/lib/media-cleanup.ts` (queries Supabase tables for references, deletes from Supabase Storage)
 
 ## Favicon / Browser Tab Icon
-- File: `src/app/icon.png` (Next.js file-based metadata convention — auto-served, no metadata wiring needed)
-- The default `create-next-app` favicon (`src/app/favicon.ico`) was deleted and replaced.
-- Admin profile has a Browser Tab Icon uploader (stores path in `profile` table `favicon` column, handles media cleanup), but the actual tab icon is served from the static `src/app/icon.png`.
-- To change the favicon: replace `src/app/icon.png` directly.
-- Do NOT use `generateMetadata()` for favicon in root layout — Next.js caches the result and the icon does not update reliably.
+- Dynamic route handler: `src/app/icon/route.ts` serves the favicon at `/icon`
+- Reads `profile.favicon` from Supabase; if set, fetches and proxies the image from Supabase Storage
+- If no favicon is configured, falls back to `public/default-favicon.png` (JRS logo, transparent background, 180x180)
+- `src/app/layout.tsx` metadata uses `icons: { icon: '/icon' }` (static reference to the dynamic route)
+- Admin profile "Browser Tab Icon" uploader uploads to Supabase Storage and saves the URL in `profile.favicon` column
+- Cache: dynamic favicon has 1-hour `max-age`; default fallback has 24-hour `max-age`
+- The old static `src/app/icon.png` and `src/app/favicon.ico` have been removed
 
 ## Contact Form Email
 - Route: `src/app/api/contact/route.ts`
@@ -215,7 +217,8 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `.codex/skills/portfolio-maintainer/agents/openai.yaml`
 - `.codex/skills/portfolio-maintainer/references/*`
 - `README.md`
-- `src/app/icon.png`
+- `src/app/icon/route.ts`
+- `public/default-favicon.png`
 - `src/app/page.tsx`
 - `src/app/api/upload/route.ts`
 - `next.config.ts`
@@ -223,7 +226,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `scripts/setup-supabase.ts`
 - `scripts/migrate-to-supabase.ts`
 - `scripts/create-admin-user.ts`
-- `src/proxy.ts`
+- `src/middleware.ts`
 - `src/app/api/auth/login/route.ts`
 - `src/app/api/auth/logout/route.ts`
 - `src/app/admin/login/page.tsx`
@@ -237,7 +240,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
   - `src/app/admin/services/page.tsx`
   - `src/hooks/usePreloader.ts`
 - These are pre-existing lint-policy issues and not runtime blockers for current features.
-- **Favicon via `generateMetadata()` is unreliable**: Next.js aggressively caches root layout metadata. Using `export const dynamic = "force-dynamic"` forces all pages to dynamic rendering (unacceptable perf cost). The file-based `src/app/icon.png` convention is the only reliable method for favicons in Next.js App Router. The admin favicon uploader field (`profile.favicon`) is retained for media cleanup but does NOT drive the actual browser tab icon.
+- **Favicon**: Now served dynamically via `src/app/icon/route.ts`. The route reads `profile.favicon` from Supabase and proxies the image. Browser caching (1h `max-age`) means changes may take up to an hour to appear for returning visitors. Hard-refresh or cache-clear shows changes immediately.
 
 ## Practical Notes for Future Sessions
 - All data is now in Supabase. Do NOT read/write `data/*.json` at runtime; those files are legacy references only.
@@ -372,7 +375,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Rewrote `src/app/api/auth/login/route.ts` to use `supabase.auth.signInWithPassword()`.
 - Created `src/app/api/auth/logout/route.ts` with `supabase.auth.signOut()`.
 - Rewrote `src/lib/api-auth.ts`: `authenticateRequest()` now verifies Supabase session via `getUser()` (no `req` param).
-- Rewrote `src/proxy.ts` middleware to use Supabase session verification instead of custom JWT.
+- Rewrote `src/middleware.ts` (was `src/proxy.ts`) middleware to use Supabase session verification instead of custom JWT.
 - Updated `src/app/admin/login/page.tsx` with email + password fields.
 - Updated `src/components/admin/Sidebar.tsx` logout to call `POST /api/auth/logout`.
 - Deleted `src/lib/auth.ts` (bcrypt + jose no longer needed).
@@ -380,6 +383,17 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Commented out `JWT_SECRET`, `ADMIN_PASSWORD_HASH`, `password` env vars.
 - Created `scripts/create-admin-user.ts` for one-time admin user provisioning.
 - Updated all API routes: `authenticateRequest(req)` -> `authenticateRequest()`.
+
+### 2026-02-23 (Auth Cookie Fix + Dynamic Favicon)
+- Fixed middleware not loading: renamed `src/proxy.ts` to `src/middleware.ts` and function `proxy` to `middleware` (Next.js requires this naming convention).
+- Fixed login/logout session cookies not reaching the browser: rewrote `src/app/api/auth/login/route.ts` and `src/app/api/auth/logout/route.ts` to use response-based Supabase client (cookies set directly on `NextResponse` instead of via `cookies()` from `next/headers`).
+- Changed post-login redirect from `/admin/projects` to `/admin/profile`.
+- Replaced static `src/app/icon.png` with dynamic route handler `src/app/icon/route.ts`:
+  - Reads `profile.favicon` from Supabase; proxies image from Supabase Storage if set.
+  - Falls back to `public/default-favicon.png` (JRS logo, transparent background, 180x180).
+  - Layout metadata references `/icon` statically via `icons: { icon: '/icon' }`.
+- Deleted old `src/app/icon.png` static file.
+- Added `public/default-favicon.png` (transparent-background JRS logo fallback).
 
 ### Template For Next Entries
 - `YYYY-MM-DD`

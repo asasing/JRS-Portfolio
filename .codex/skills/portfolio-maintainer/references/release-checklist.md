@@ -45,5 +45,5 @@
 - Confirm admin user exists in Supabase Auth (create via `npx tsx scripts/create-admin-user.ts <email> <password>` if needed).
 - Confirm login flow works end-to-end: `/admin/login` → `/api/auth/login` → Supabase session cookie set → admin pages accessible.
 - Confirm logout clears session: sidebar logout → `/api/auth/logout` → redirect to login.
-- Confirm middleware (`src/proxy.ts`) redirects unauthenticated requests to `/admin/login`.
+- Confirm middleware (`src/middleware.ts`) redirects unauthenticated requests to `/admin/login`.
 - Confirm all protected API routes call `authenticateRequest()` (no `req` parameter) and return 401 on failure.

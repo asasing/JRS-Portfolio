@@ -32,6 +32,7 @@ export const metadata: Metadata = {
     "react",
     "nextjs",
   ],
+  icons: { icon: "/icon" },
 };
 
 export default function RootLayout({

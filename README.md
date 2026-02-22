@@ -74,4 +74,4 @@ Admin pages and related APIs:
 - Tailwind-only styling (no Bootstrap).
 - Keep admin edit flow, API normalization, and public rendering aligned when adding fields.
 - Removed/replaced images are cleaned automatically from Supabase Storage when they are no longer referenced by database records.
-- Browser tab icon: replace `src/app/icon.png` (Next.js file-based metadata). Do not add a `favicon.ico` alongside it — browsers prioritize `.ico` over `.png`.
+- Browser tab icon: upload via Admin > Profile > Browser Tab Icon. Served dynamically by `src/app/icon/route.ts`; fallback is `public/default-favicon.png`.

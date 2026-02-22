@@ -25,7 +25,7 @@ export default function AdminLogin() {
       });
 
       if (res.ok) {
-        router.push("/admin/projects");
+        router.push("/admin/profile");
       } else {
         const data = await res.json();
         setError(data.error || "Invalid credentials");

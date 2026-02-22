@@ -24,7 +24,7 @@
 - Provider: Supabase Auth (email + password)
 - Login: `src/app/api/auth/login/route.ts` → `supabase.auth.signInWithPassword()`
 - Logout: `src/app/api/auth/logout/route.ts` → `supabase.auth.signOut()`
-- Middleware: `src/proxy.ts` — verifies Supabase session, redirects unauthenticated to `/admin/login`
+- Middleware: `src/middleware.ts` — verifies Supabase session, redirects unauthenticated to `/admin/login`
 - API auth: `src/lib/api-auth.ts` → `authenticateRequest()` verifies session via `supabase.auth.getUser()`
 - Browser client: `src/lib/supabase-browser.ts` — used by client components
 - Server client: `createSupabaseServerClient()` in `src/lib/supabase.ts` — cookie-based via `@supabase/ssr`
@@ -49,9 +49,10 @@
 - Keep render-time fallback guards for missing/blank image paths.
 
 ## Favicon
-- Static file: `src/app/icon.png` (Next.js file-based metadata convention)
-- Do NOT use `generateMetadata()` or `favicon.ico` for this — see Known Issues in `CLAUDE.md`
-- Profile model has a `favicon` field (used by admin uploader + media cleanup) but the actual tab icon is the static file above
+- Dynamic route handler: `src/app/icon/route.ts` serves at `/icon`
+- Reads `profile.favicon` from Supabase; proxies image if set, otherwise returns `public/default-favicon.png`
+- Layout metadata: `icons: { icon: '/icon' }` (static reference, no `generateMetadata()`)
+- Admin profile uploader stores favicon URL in `profile.favicon` column; media cleanup handles old images
 
 ## Analytics Layer
 - Provider: PostHog (`posthog-js`)

@@ -1,11 +1,29 @@
-import { NextResponse } from "next/server";
-import { createSupabaseServerClient } from "@/lib/supabase";
+import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 
-export async function POST() {
+export async function POST(req: NextRequest) {
   try {
-    const supabase = await createSupabaseServerClient();
+    const response = NextResponse.json({ success: true });
+
+    const supabase = createServerClient(
+      process.env.NEXT_PUBLIC_SUPABASE_URL!,
+      process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+      {
+        cookies: {
+          getAll() {
+            return req.cookies.getAll();
+          },
+          setAll(cookiesToSet) {
+            for (const { name, value, options } of cookiesToSet) {
+              response.cookies.set(name, value, options);
+            }
+          },
+        },
+      }
+    );
+
     await supabase.auth.signOut();
-    return NextResponse.json({ success: true });
+    return response;
   } catch {
     return NextResponse.json(
       { error: "Logout failed" },

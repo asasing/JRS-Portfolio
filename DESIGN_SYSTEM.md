@@ -254,6 +254,16 @@ Responsive card grid with neutral year badge, provider palette accents, optional
 
 ---
 
+## Favicon / Browser Tab Icon
+
+- File: `src/app/icon.png` (Next.js file-based metadata — auto-served at `/icon.png`)
+- JRS logo on dark background, 1024x1024 PNG.
+- To replace: swap `src/app/icon.png` with a new image file. Next.js picks it up automatically on restart.
+- Do NOT use a `favicon.ico` in `src/app/` alongside `icon.png` — browsers prioritize `.ico` over `.png`. Keep only one.
+- Do NOT use `generateMetadata()` to set favicon dynamically — Next.js caches root layout metadata and the icon will not update.
+
+---
+
 ## Navigation
 
 ### Header (fixed)
@@ -343,6 +353,7 @@ Anchors: `#about`, `#services`, `#portfolio`, `#certifications`, `#contact`.
 
 ## File References
 
+- Browser tab icon: `src/app/icon.png`
 - Design tokens and utilities: `src/app/globals.css`
 - Font loading: `src/app/layout.tsx`
 - Portfolio components: `src/components/portfolio/*`

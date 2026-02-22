@@ -23,6 +23,11 @@
 - Public path pattern: `/images/<category>/<file>`
 - Keep render-time fallback guards for missing/blank image paths.
 
+## Favicon
+- Static file: `src/app/icon.png` (Next.js file-based metadata convention)
+- Do NOT use `generateMetadata()` or `favicon.ico` for this — see Known Issues in `CLAUDE.md`
+- Profile model has a `favicon` field (used by admin uploader + media cleanup) but the actual tab icon is the static file above
+
 ## Analytics Layer
 - Provider: PostHog (`posthog-js`)
 - Init: `src/components/analytics/PostHogProvider.tsx` — client component in root layout, excluded on `/admin/*`

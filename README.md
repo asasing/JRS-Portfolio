@@ -65,3 +65,4 @@ Admin pages and related APIs:
 - Tailwind-only styling (no Bootstrap).
 - Keep admin edit flow, API normalization, and public rendering aligned when adding fields.
 - Removed/replaced images are cleaned automatically when they are no longer referenced by data (protected placeholders are retained).
+- Browser tab icon: replace `src/app/icon.png` (Next.js file-based metadata). Do not add a `favicon.ico` alongside it — browsers prioritize `.ico` over `.png`.

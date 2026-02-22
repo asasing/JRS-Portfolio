@@ -69,6 +69,9 @@ async function getReferencedImagePaths(): Promise<Set<string>> {
   const profilePhoto = normalizeImagePath(profile.profilePhoto);
   if (profilePhoto) refs.add(profilePhoto);
 
+  const faviconPath = normalizeImagePath(profile.favicon);
+  if (faviconPath) refs.add(faviconPath);
+
   for (const image of extractImageSrcsFromHtml(profile.bio)) {
     refs.add(image);
   }

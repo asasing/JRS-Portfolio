@@ -32,6 +32,7 @@ const emptyProfile: Profile = {
   profilePhotoFocusY: 50,
   profilePhotoZoom: 1,
   skills: [], stats: [], socials: [], email: "", phone: "",
+  favicon: "",
 };
 
 const normalizeProfile = (raw: Partial<Profile>): Profile => ({
@@ -284,6 +285,19 @@ export default function AdminProfile() {
                 })
               }
             />
+          </div>
+
+          {/* Favicon / Browser Tab Icon */}
+          <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+            <h2 className="text-lg font-semibold text-text-primary mb-4">Browser Tab Icon</h2>
+            <ImageUploader
+              value={profile.favicon || ""}
+              category="profile"
+              onChange={(path) => setProfile({ ...profile, favicon: path })}
+            />
+            <p className="text-xs text-text-muted mt-3">
+              Recommended: PNG or SVG, 32&times;32 or 180&times;180 pixels.
+            </p>
           </div>
 
           {/* Skills */}

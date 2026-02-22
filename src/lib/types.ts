@@ -12,6 +12,7 @@ export interface Profile {
   socials: { platform: string; url: string; icon: string }[];
   email: string;
   phone: string;
+  favicon?: string;
 }
 
 export interface Attachment {

@@ -22,8 +22,16 @@ const jetbrainsMono = JetBrains_Mono({
 
 export const metadata: Metadata = {
   title: "John Roldan Sasing | Portfolio",
-  description: "Full Stack Developer - Personal Portfolio. Building modern web applications with clean, efficient, and user-friendly digital experiences.",
-  keywords: ["portfolio", "developer", "full stack", "web development", "react", "nextjs"],
+  description:
+    "Full Stack Developer - Personal Portfolio. Building modern web applications with clean, efficient, and user-friendly digital experiences.",
+  keywords: [
+    "portfolio",
+    "developer",
+    "full stack",
+    "web development",
+    "react",
+    "nextjs",
+  ],
 };
 
 export default function RootLayout({

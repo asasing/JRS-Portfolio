@@ -175,5 +175,6 @@ export function normalizeProfileData(raw: Partial<Profile>): Profile {
     socials: normalizeSocials(raw.socials),
     email: raw.email || "",
     phone: raw.phone || "",
+    favicon: typeof raw.favicon === "string" ? raw.favicon.trim() : "",
   };
 }

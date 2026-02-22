@@ -20,8 +20,17 @@ export async function PUT(req: NextRequest) {
   const profile = normalizeProfileData({ ...current, ...incoming });
 
   await writeJsonFile("profile.json", profile);
+
+  const oldImages: string[] = [];
   if (current.profilePhoto && current.profilePhoto !== profile.profilePhoto) {
-    void removeImagesIfUnused([current.profilePhoto]);
+    oldImages.push(current.profilePhoto);
   }
+  if (current.favicon && current.favicon !== profile.favicon) {
+    oldImages.push(current.favicon);
+  }
+  if (oldImages.length > 0) {
+    void removeImagesIfUnused(oldImages);
+  }
+
   return NextResponse.json(profile);
 }

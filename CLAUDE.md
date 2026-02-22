@@ -1,4 +1,4 @@
-﻿# CLAUDE.md
+# CLAUDE.md
 
 ## Purpose
 This file is a persistent project context and handoff note for future sessions.
@@ -39,6 +39,13 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Stores files under `public/images/<category>`
 - Current policy: removed/replaced image files are cleaned up when they are no longer referenced by `data/*.json`
 - Cleanup helper: `src/lib/media-cleanup.ts`
+
+## Favicon / Browser Tab Icon
+- File: `src/app/icon.png` (Next.js file-based metadata convention — auto-served, no metadata wiring needed)
+- The default `create-next-app` favicon (`src/app/favicon.ico`) was deleted and replaced.
+- Admin profile has a Browser Tab Icon uploader (stores path in `profile.json` `favicon` field, handles media cleanup), but the actual tab icon is served from the static `src/app/icon.png`.
+- To change the favicon: replace `src/app/icon.png` directly.
+- Do NOT use `generateMetadata()` for favicon in root layout — Next.js caches the result and the icon does not update reliably.
 
 ## Contact Form Email
 - Route: `src/app/api/contact/route.ts`
@@ -196,6 +203,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `.codex/skills/portfolio-maintainer/agents/openai.yaml`
 - `.codex/skills/portfolio-maintainer/references/*`
 - `README.md`
+- `src/app/icon.png`
 
 ## Known Issues / Caveats
 - `npm run lint` currently fails on existing rule `react-hooks/set-state-in-effect` in multiple files:
@@ -205,6 +213,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
   - `src/app/admin/services/page.tsx`
   - `src/hooks/usePreloader.ts`
 - These are pre-existing lint-policy issues and not runtime blockers for current features.
+- **Favicon via `generateMetadata()` is unreliable**: Next.js aggressively caches root layout metadata. Using `export const dynamic = "force-dynamic"` forces all pages to dynamic rendering (unacceptable perf cost). The file-based `src/app/icon.png` convention is the only reliable method for favicons in Next.js App Router. The admin favicon uploader field (`profile.favicon`) is retained for media cleanup but does NOT drive the actual browser tab icon.
 
 ## Practical Notes for Future Sessions
 - Prefer JSON/API consistency over direct file edits from UI assumptions.
@@ -300,6 +309,16 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Updated `src/components/portfolio/Projects.tsx` with rail-only fixed card wrapper sizing and rail-specific card mode.
 - Added confidentiality caveat text block below Recent Works heading.
 - Added rail layout helper classes in `src/app/globals.css` (`.project-card-rail`, `.project-card-rail__media`, `.project-card-rail__meta`).
+
+### 2026-02-22 (Favicon / Browser Tab Icon)
+- Deleted default Next.js `src/app/favicon.ico` (Vercel triangle icon that shipped with `create-next-app`).
+- Placed JRS logo as `src/app/icon.png` — Next.js file-based metadata convention auto-serves it as the browser tab icon.
+- Added optional `favicon` field to `Profile` interface in `src/lib/types.ts` and normalizer in `src/lib/profile-normalizers.ts`.
+- Added Browser Tab Icon uploader card to admin profile page (`src/app/admin/profile/page.tsx`) with `ImageUploader`.
+- Updated `src/lib/media-cleanup.ts` to track favicon as a referenced image path.
+- Updated `src/app/api/profile/route.ts` to clean up old favicon image on replacement.
+- Reverted `src/app/layout.tsx` to static `metadata` export (removed `generateMetadata()` and `force-dynamic` — dynamic metadata was unreliable for favicons due to Next.js caching; the file-based `icon.png` approach is more reliable).
+- **Caveat**: The admin favicon uploader stores the path in `profile.json` and handles media cleanup, but the actual browser tab icon is served from the static `src/app/icon.png` file. To change the favicon, replace `src/app/icon.png` directly. A future improvement could wire the admin-uploaded favicon to overwrite `src/app/icon.png` at save time.
 
 ### Template For Next Entries
 - `YYYY-MM-DD`

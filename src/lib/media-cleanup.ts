@@ -1,27 +1,19 @@
 import "server-only";
 
-import fs from "fs/promises";
-import path from "path";
-import { readJsonFile } from "@/lib/data";
-import { Certification, Profile, Project, Service } from "@/lib/types";
+import { supabaseAdmin, extractStoragePath } from "@/lib/supabase";
+import {
+  getProfile,
+  getProjects,
+  getCertifications,
+  getServices,
+} from "@/lib/data";
 
-const PUBLIC_DIR = path.join(process.cwd(), "public");
-const IMAGE_ROOT_DIR = path.join(PUBLIC_DIR, "images");
-
-const PROTECTED_IMAGE_PATHS = new Set<string>([
-  "/images/projects/placeholder-1.svg",
-  "/images/projects/placeholder-2.svg",
-  "/images/projects/placeholder-3.svg",
-  "/images/profile/photo.svg",
-]);
-
-function isPublicImagePath(value: unknown): value is string {
-  return typeof value === "string" && value.trim().startsWith("/images/");
-}
-
-function normalizeImagePath(value: unknown): string {
-  if (!isPublicImagePath(value)) return "";
-  return value.trim();
+function isImageUrl(value: unknown): value is string {
+  if (typeof value !== "string" || !value.trim()) return false;
+  return (
+    value.includes("/storage/v1/object/public/images/") ||
+    value.startsWith("/images/")
+  );
 }
 
 function extractImageSrcsFromHtml(html: unknown): string[] {
@@ -32,139 +24,105 @@ function extractImageSrcsFromHtml(html: unknown): string[] {
   let match: RegExpExecArray | null = regex.exec(html);
 
   while (match) {
-    const src = normalizeImagePath(match[1]);
-    if (src) results.push(src);
+    if (match[1]) results.push(match[1]);
     match = regex.exec(html);
   }
 
   return results;
 }
 
-function projectImagePaths(project: Project): string[] {
-  const paths: string[] = [];
-  const thumb = normalizeImagePath(project.thumbnail);
-  if (thumb) paths.push(thumb);
-
-  if (Array.isArray(project.gallery)) {
-    for (const item of project.gallery) {
-      const image = normalizeImagePath(item);
-      if (image) paths.push(image);
-    }
-  }
-
-  paths.push(...extractImageSrcsFromHtml(project.description));
-  return paths;
-}
-
-async function getReferencedImagePaths(): Promise<Set<string>> {
+async function getReferencedStoragePaths(): Promise<Set<string>> {
   const refs = new Set<string>();
 
   const [profile, projects, certifications, services] = await Promise.all([
-    readJsonFile<Partial<Profile>>("profile.json"),
-    readJsonFile<Project[]>("projects.json"),
-    readJsonFile<Certification[]>("certifications.json"),
-    readJsonFile<Service[]>("services.json"),
+    getProfile(),
+    getProjects(),
+    getCertifications(),
+    getServices(),
   ]);
 
-  const profilePhoto = normalizeImagePath(profile.profilePhoto);
-  if (profilePhoto) refs.add(profilePhoto);
+  const addRef = (url: string) => {
+    const p = extractStoragePath(url);
+    if (p) refs.add(p);
+  };
 
-  const faviconPath = normalizeImagePath(profile.favicon);
-  if (faviconPath) refs.add(faviconPath);
-
-  for (const image of extractImageSrcsFromHtml(profile.bio)) {
-    refs.add(image);
-  }
+  if (isImageUrl(profile.profilePhoto)) addRef(profile.profilePhoto);
+  if (isImageUrl(profile.favicon)) addRef(profile.favicon);
+  for (const src of extractImageSrcsFromHtml(profile.bio)) addRef(src);
 
   for (const project of projects) {
-    for (const image of projectImagePaths(project)) {
-      refs.add(image);
+    if (isImageUrl(project.thumbnail)) addRef(project.thumbnail);
+    for (const img of project.gallery ?? []) {
+      if (isImageUrl(img)) addRef(img);
+    }
+    for (const src of extractImageSrcsFromHtml(project.description)) {
+      addRef(src);
     }
   }
 
   for (const cert of certifications) {
-    const image = normalizeImagePath(cert.thumbnail);
-    if (image) refs.add(image);
+    if (isImageUrl(cert.thumbnail)) addRef(cert.thumbnail);
   }
 
   for (const service of services) {
-    const image = normalizeImagePath(service.icon);
-    if (image) refs.add(image);
+    if (isImageUrl(service.icon)) addRef(service.icon);
   }
 
   return refs;
 }
 
-async function fileExists(filePath: string): Promise<boolean> {
-  try {
-    await fs.access(filePath);
-    return true;
-  } catch {
-    return false;
-  }
-}
+export async function removeImagesIfUnused(
+  candidates: string[]
+): Promise<string[]> {
+  const paths = candidates
+    .map((c) => extractStoragePath(c))
+    .filter((p): p is string => !!p);
 
-function publicPathToFsPath(imagePath: string): string {
-  return path.join(PUBLIC_DIR, imagePath.replace(/^\//, ""));
-}
+  if (paths.length === 0) return [];
 
-async function listImageFiles(dir: string): Promise<string[]> {
-  const entries = await fs.readdir(dir, { withFileTypes: true });
-  const paths: string[] = [];
+  const refs = await getReferencedStoragePaths();
+  const toDelete = paths.filter((p) => !refs.has(p));
 
-  for (const entry of entries) {
-    const full = path.join(dir, entry.name);
-    if (entry.isDirectory()) {
-      paths.push(...(await listImageFiles(full)));
-      continue;
-    }
-    if (!entry.isFile()) continue;
+  if (toDelete.length === 0) return [];
 
-    const rel = full.slice(PUBLIC_DIR.length).replace(/\\/g, "/");
-    paths.push(rel.startsWith("/") ? rel : `/${rel}`);
+  const { error } = await supabaseAdmin.storage
+    .from("images")
+    .remove(toDelete);
+
+  if (error) {
+    console.error("Failed to remove images from storage:", error);
+    return [];
   }
 
-  return paths;
-}
-
-export async function removeImagesIfUnused(candidates: string[]): Promise<string[]> {
-  const normalizedCandidates = Array.from(
-    new Set(
-      candidates
-        .map((candidate) => normalizeImagePath(candidate))
-        .filter((candidate) => candidate && !PROTECTED_IMAGE_PATHS.has(candidate))
-    )
-  );
-
-  if (normalizedCandidates.length === 0) return [];
-
-  const refs = await getReferencedImagePaths();
-  const deleted: string[] = [];
-
-  for (const imagePath of normalizedCandidates) {
-    if (refs.has(imagePath)) continue;
-
-    const fsPath = publicPathToFsPath(imagePath);
-    if (!(await fileExists(fsPath))) continue;
-
-    await fs.unlink(fsPath);
-    deleted.push(imagePath);
-  }
-
-  return deleted;
+  return toDelete;
 }
 
 export async function cleanupAllUnusedImages(): Promise<string[]> {
-  if (!(await fileExists(IMAGE_ROOT_DIR))) return [];
+  const refs = await getReferencedStoragePaths();
 
-  const [allImages, refs] = await Promise.all([
-    listImageFiles(IMAGE_ROOT_DIR),
-    getReferencedImagePaths(),
-  ]);
+  const allFiles: string[] = [];
+  const folders = ["profile", "projects", "services", "certifications"];
 
-  const orphaned = allImages.filter(
-    (imagePath) => !refs.has(imagePath) && !PROTECTED_IMAGE_PATHS.has(imagePath)
-  );
+  for (const folder of folders) {
+    const { data } = await supabaseAdmin.storage.from("images").list(folder);
+    if (data) {
+      for (const file of data) {
+        if (file.name) allFiles.push(`${folder}/${file.name}`);
+      }
+    }
+  }
 
-  return removeImagesIfUnused(orphaned);
+  const orphaned = allFiles.filter((p) => !refs.has(p));
+  if (orphaned.length === 0) return [];
+
+  const { error } = await supabaseAdmin.storage
+    .from("images")
+    .remove(orphaned);
+
+  if (error) {
+    console.error("Failed to cleanup images:", error);
+    return [];
+  }
+
+  return orphaned;
 }

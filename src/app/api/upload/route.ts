@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { authenticateRequest } from "@/lib/api-auth";
-import fs from "fs/promises";
-import path from "path";
+import { supabaseAdmin, getImagePublicUrl } from "@/lib/supabase";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -18,28 +17,44 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No file provided" }, { status: 400 });
     }
 
-    // Validate file type
-    const allowedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    const allowedTypes = [
+      "image/jpeg",
+      "image/png",
+      "image/webp",
+      "image/gif",
+      "image/svg+xml",
+    ];
     if (!allowedTypes.includes(file.type)) {
       return NextResponse.json({ error: "Invalid file type" }, { status: 400 });
     }
 
-    // Max 5MB
     if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: "File too large (max 5MB)" }, { status: 400 });
+      return NextResponse.json(
+        { error: "File too large (max 5MB)" },
+        { status: 400 }
+      );
     }
 
     const ext = file.name.split(".").pop() || "jpg";
     const filename = `${crypto.randomUUID().slice(0, 8)}-${Date.now()}.${ext}`;
-    const dir = path.join(process.cwd(), "public", "images", category);
-
-    await fs.mkdir(dir, { recursive: true });
+    const storagePath = `${category}/${filename}`;
 
     const buffer = Buffer.from(await file.arrayBuffer());
-    await fs.writeFile(path.join(dir, filename), buffer);
 
-    const publicPath = `/images/${category}/${filename}`;
-    return NextResponse.json({ path: publicPath });
+    const { error } = await supabaseAdmin.storage
+      .from("images")
+      .upload(storagePath, buffer, {
+        contentType: file.type,
+        upsert: false,
+      });
+
+    if (error) {
+      console.error("Supabase Storage upload error:", error);
+      return NextResponse.json({ error: "Upload failed" }, { status: 500 });
+    }
+
+    const publicUrl = getImagePublicUrl(storagePath);
+    return NextResponse.json({ path: publicUrl });
   } catch {
     return NextResponse.json({ error: "Upload failed" }, { status: 500 });
   }

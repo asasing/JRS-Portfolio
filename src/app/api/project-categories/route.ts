@@ -1,5 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJsonFile, writeJsonFile } from "@/lib/data";
+import {
+  getProjects,
+  getProjectCategories,
+  updateProjectCategories,
+  updateProject,
+} from "@/lib/data";
 import { authenticateRequest } from "@/lib/api-auth";
 import { Project, ProjectCategory } from "@/lib/types";
 import { normalizeProject } from "@/lib/project-normalizers";
@@ -8,28 +13,10 @@ import {
   toProjectCategoryLabelSet,
 } from "@/lib/project-category-normalizers";
 
-async function loadNormalizedProjects(): Promise<Project[]> {
-  const projects = await readJsonFile<Project[]>("projects.json");
-  return projects.map((project) => normalizeProject(project));
-}
-
-async function loadCategories(projects: Project[]): Promise<ProjectCategory[]> {
-  let inputCategories: unknown = [];
-
-  try {
-    inputCategories = await readJsonFile<Partial<ProjectCategory>[]>(
-      "project-categories.json"
-    );
-  } catch {
-    inputCategories = [];
-  }
-
-  return normalizeProjectCategoryList(inputCategories, projects);
-}
-
 export async function GET() {
-  const projects = await loadNormalizedProjects();
-  const categories = await loadCategories(projects);
+  const projects = await getProjects();
+  const storedCategories = await getProjectCategories();
+  const categories = normalizeProjectCategoryList(storedCategories, projects);
   return NextResponse.json(categories);
 }
 
@@ -41,14 +28,21 @@ export async function PUT(req: NextRequest) {
   const body = await req.json();
   const inputCategories = Array.isArray(body) ? body : body?.categories;
 
-  const projects = await loadNormalizedProjects();
-  const existingCategories = await loadCategories(projects);
+  const projects = await getProjects();
+  const existingCategories = await getProjectCategories();
+  const normalizedExisting = normalizeProjectCategoryList(
+    existingCategories,
+    projects
+  );
+
   const categories = normalizeProjectCategoryList(inputCategories, projects, {
     useFallbackWhenEmpty: false,
   });
   const allowedLabels = toProjectCategoryLabelSet(categories);
   const previousById = new Map(
-    existingCategories.map((category) => [category.id, category.label] as const)
+    normalizedExisting.map(
+      (category: ProjectCategory) => [category.id, category.label] as const
+    )
   );
   const renamedLabels = new Map<string, string>();
 
@@ -63,30 +57,30 @@ export async function PUT(req: NextRequest) {
     }
   }
 
-  const updatedProjects = projects.map((project) => {
+  for (const project of projects) {
     const dedupe = new Set<string>();
     const filteredCategories = (project.categories || [])
-      .map((label) => {
+      .map((label: string) => {
         const key = label.toLowerCase();
         return renamedLabels.get(key) || label;
       })
-      .filter((label) => allowedLabels.has(label.toLowerCase()))
-      .filter((label) => {
+      .filter((label: string) => allowedLabels.has(label.toLowerCase()))
+      .filter((label: string) => {
         const key = label.toLowerCase();
         if (dedupe.has(key)) return false;
         dedupe.add(key);
         return true;
       });
 
-    return normalizeProject({
+    const updatedProject: Project = normalizeProject({
       ...project,
       categories: filteredCategories,
       category: filteredCategories[0] || "",
     });
-  });
 
-  await writeJsonFile("project-categories.json", categories);
-  await writeJsonFile("projects.json", updatedProjects);
+    await updateProject(project.id, updatedProject);
+  }
 
-  return NextResponse.json(categories);
+  const saved = await updateProjectCategories(categories);
+  return NextResponse.json(saved);
 }

@@ -1,6 +1,6 @@
 ---
 name: portfolio-maintainer
-description: Maintain and evolve the JRS portfolio codebase across public UI, admin UI, JSON data contracts, API normalization, and PostHog analytics. Use when modifying Hero/Services/Projects/Certifications/Contact behavior, category/filter logic, media handling, contact SMTP semantics, analytics event tracking, or when syncing implementation changes with DESIGN_SYSTEM.md, CLAUDE.md, and README.md.
+description: Maintain and evolve the JRS portfolio codebase across public UI, admin UI, Supabase data layer, API normalization, and PostHog analytics. Use when modifying Hero/Services/Projects/Certifications/Contact behavior, category/filter logic, media handling, contact SMTP semantics, analytics event tracking, or when syncing implementation changes with DESIGN_SYSTEM.md, CLAUDE.md, and README.md.
 ---
 
 # Portfolio Maintainer
@@ -8,22 +8,24 @@ description: Maintain and evolve the JRS portfolio codebase across public UI, ad
 Execute portfolio changes with data-contract/API/admin/public/doc consistency.
 
 ## Core Principles
-- Keep `types -> normalizers -> API -> admin form -> public render` aligned.
+- Keep `types -> normalizers -> data layer -> API -> admin form -> public render` aligned.
 - Prefer shared normalizers/constants over duplicated per-route logic.
-- Preserve compatibility with existing `data/*.json` content.
+- Data lives in Supabase (Postgres tables + Storage bucket). Do NOT read/write `data/*.json` at runtime.
+- Images are stored in Supabase Storage bucket `images` and referenced by full public URLs in the database.
 - Update docs whenever behavior or UI policy changes.
 
 ## Standard Workflow
 1. Inspect impacted model in `src/lib/types.ts`.
 2. Update relevant normalizer(s) in `src/lib/*-normalizers.ts`.
-3. Update API route(s) under `src/app/api/*`.
-4. Update admin editor flow under `src/app/admin/*`.
-5. Update public renderer under `src/components/portfolio/*`.
-6. Update docs:
+3. Update data layer functions in `src/lib/data.ts` (Supabase CRUD + row mappers).
+4. Update API route(s) under `src/app/api/*`.
+5. Update admin editor flow under `src/app/admin/*`.
+6. Update public renderer under `src/components/portfolio/*`.
+7. Update docs:
 - `README.md`
 - `DESIGN_SYSTEM.md`
 - `CLAUDE.md`
-7. Verify:
+8. Verify:
 - `npm run build`
 - `npm run lint` (do not worsen baseline)
 

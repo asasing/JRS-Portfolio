@@ -7,8 +7,9 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 ## Project Overview
 - Project: `JRS-Portfolio`
 - Stack: Next.js App Router, React, TypeScript, Tailwind CSS v4, Framer Motion
-- Data source: local JSON files in `data/`
+- Data source: Supabase (Postgres for data, Storage for images)
 - Admin panel: `/admin/*` for managing profile, projects, services, certifications
+- Legacy: local JSON files in `data/` are retained as reference but no longer used at runtime
 
 ## Run and Verify
 - Install: `npm install`
@@ -21,8 +22,11 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - API routes: `src/app/api/*`
 - UI components: `src/components/*`
 - Shared types: `src/lib/types.ts`
-- JSON content: `data/profile.json`, `data/projects.json`, `data/services.json`, `data/certifications.json`, `data/project-categories.json`
-- Uploaded images location: `public/images/<category>/...`
+- Supabase client: `src/lib/supabase.ts` (public anon client + admin service_role client)
+- Data layer: `src/lib/data.ts` (entity-specific CRUD functions backed by Supabase)
+- Database tables: `profile`, `projects`, `project_categories`, `services`, `certifications`, `contact_submissions`
+- Image storage: Supabase Storage bucket `images` with folders `profile/`, `projects/`, `services/`, `certifications/`
+- Legacy JSON content (reference only): `data/profile.json`, `data/projects.json`, `data/services.json`, `data/certifications.json`, `data/project-categories.json`
 
 ## Auth and Admin Access
 - Login API: `src/app/api/auth/login/route.ts`
@@ -36,9 +40,10 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 ## Upload System
 - Upload endpoint: `POST /api/upload` (`src/app/api/upload/route.ts`)
 - Accepts image files and `category` form field
-- Stores files under `public/images/<category>`
-- Current policy: removed/replaced image files are cleaned up when they are no longer referenced by `data/*.json`
-- Cleanup helper: `src/lib/media-cleanup.ts`
+- Stores files in Supabase Storage bucket `images` under `<category>/` folder
+- Returns full Supabase Storage public URL (e.g., `https://<ref>.supabase.co/storage/v1/object/public/images/projects/abc.png`)
+- Current policy: removed/replaced image files are cleaned up from Supabase Storage when they are no longer referenced by database records
+- Cleanup helper: `src/lib/media-cleanup.ts` (queries Supabase tables for references, deletes from Supabase Storage)
 
 ## Favicon / Browser Tab Icon
 - File: `src/app/icon.png` (Next.js file-based metadata convention — auto-served, no metadata wiring needed)
@@ -62,6 +67,10 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `JWT_SECRET`
 - `ADMIN_PASSWORD_HASH`
 - Optional fallback auth vars: `ADMIN_PASSWORD`, `password`
+- Supabase vars:
+  - `NEXT_PUBLIC_SUPABASE_URL` (Supabase project URL)
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Supabase anon/public key — used for public reads)
+  - `SUPABASE_SERVICE_ROLE_KEY` (Supabase service role key — used for admin writes, bypasses RLS)
 - Contact email vars:
   - `CONTACT_TO_EMAIL`
   - `SMTP_HOST`
@@ -158,6 +167,8 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Session recordings, heatmaps, and geo data available in PostHog dashboard without additional code.
 
 ## Important Files Touched Recently
+- `src/lib/supabase.ts`
+- `src/lib/data.ts`
 - `src/lib/analytics.ts`
 - `src/components/analytics/PostHogProvider.tsx`
 - `src/components/analytics/SectionTracker.tsx`
@@ -204,6 +215,12 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `.codex/skills/portfolio-maintainer/references/*`
 - `README.md`
 - `src/app/icon.png`
+- `src/app/page.tsx`
+- `src/app/api/upload/route.ts`
+- `next.config.ts`
+- `scripts/supabase-migration.sql`
+- `scripts/setup-supabase.ts`
+- `scripts/migrate-to-supabase.ts`
 
 ## Known Issues / Caveats
 - `npm run lint` currently fails on existing rule `react-hooks/set-state-in-effect` in multiple files:
@@ -216,11 +233,14 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - **Favicon via `generateMetadata()` is unreliable**: Next.js aggressively caches root layout metadata. Using `export const dynamic = "force-dynamic"` forces all pages to dynamic rendering (unacceptable perf cost). The file-based `src/app/icon.png` convention is the only reliable method for favicons in Next.js App Router. The admin favicon uploader field (`profile.favicon`) is retained for media cleanup but does NOT drive the actual browser tab icon.
 
 ## Practical Notes for Future Sessions
-- Prefer JSON/API consistency over direct file edits from UI assumptions.
+- All data is now in Supabase. Do NOT read/write `data/*.json` at runtime; those files are legacy references only.
+- Data layer: `src/lib/data.ts` exposes entity-specific functions (e.g., `getProjects()`, `updateProfile()`, `createCertification()`). API routes use these instead of `readJsonFile`/`writeJsonFile`.
+- Image URLs stored in the database are full Supabase Storage public URLs. Components render them directly via `<img>` or `next/image`.
 - For admin media features, reuse `ImageUploader` and `/api/upload` first.
-- Media cleanup is automatic on profile/projects/services/certifications update/delete routes; do not rely on manual file pruning.
-- For profile changes, ensure `src/lib/types.ts`, `data/profile.json`, admin UI, and `/api/profile` stay aligned.
-- Preserve protected default assets (`/images/projects/placeholder-*.svg`, `/images/profile/photo.svg`).
+- Media cleanup is automatic on profile/projects/services/certifications update/delete routes; unreferenced images are deleted from Supabase Storage.
+- For profile changes, ensure `src/lib/types.ts`, Supabase `profile` table, admin UI, and `/api/profile` stay aligned.
+- `next.config.ts` has `remotePatterns` configured for the Supabase Storage hostname. If the project is moved to a different Supabase instance, update this.
+- Contact form submissions are stored in `contact_submissions` table in addition to sending SMTP email.
 
 ## Change Log
 ### 2026-02-19 (UI Spacing and Typography Pass)
@@ -319,6 +339,23 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Updated `src/app/api/profile/route.ts` to clean up old favicon image on replacement.
 - Reverted `src/app/layout.tsx` to static `metadata` export (removed `generateMetadata()` and `force-dynamic` — dynamic metadata was unreliable for favicons due to Next.js caching; the file-based `icon.png` approach is more reliable).
 - **Caveat**: The admin favicon uploader stores the path in `profile.json` and handles media cleanup, but the actual browser tab icon is served from the static `src/app/icon.png` file. To change the favicon, replace `src/app/icon.png` directly. A future improvement could wire the admin-uploaded favicon to overwrite `src/app/icon.png` at save time.
+
+### 2026-02-22 (Supabase Migration)
+- Migrated entire data layer from local JSON files (`data/*.json`) + filesystem images (`public/images/`) to Supabase Postgres + Supabase Storage.
+- Installed `@supabase/supabase-js`.
+- Created `src/lib/supabase.ts` with public (anon) and admin (service_role) clients plus Storage URL helpers.
+- Rewrote `src/lib/data.ts` from generic `readJsonFile`/`writeJsonFile` to entity-specific CRUD functions (`getProfile`, `updateProfile`, `getProjects`, `createProject`, `updateProject`, `deleteProject`, `reorderProjects`, `getProjectCategories`, `updateProjectCategories`, `getServices`, `updateServices`, `getCertifications`, `createCertification`, `updateCertification`, `deleteCertification`, `reorderCertifications`, `createContactSubmission`). Internal snake_case ↔ camelCase mappers handle DB row conversion.
+- Rewrote `src/app/api/upload/route.ts` to upload files to Supabase Storage bucket `images` and return full public URLs.
+- Rewrote `src/lib/media-cleanup.ts` to query Supabase tables for referenced images and delete orphans from Supabase Storage.
+- Updated all API routes (`profile`, `projects`, `projects/[id]`, `projects/reorder`, `project-categories`, `services`, `certifications`, `certifications/[id]`, `certifications/reorder`) to use new data layer functions.
+- Updated `src/app/api/contact/route.ts` to store contact form submissions in `contact_submissions` table in addition to sending SMTP email.
+- Updated `src/app/page.tsx` to fetch data from Supabase via data layer functions.
+- Updated `next.config.ts` with `remotePatterns` for Supabase Storage hostname.
+- Created SQL migration (`scripts/supabase-migration.sql`): 6 tables, RLS policies (public read + service_role full), Storage bucket + policies.
+- Created setup script (`scripts/setup-supabase.ts`): creates Storage bucket, verifies table existence.
+- Created data migration script (`scripts/migrate-to-supabase.ts`): seeds all existing JSON data into Supabase tables and uploads 40 local images to Supabase Storage with URL rewriting.
+- Added env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
+- Updated all documentation files (`CLAUDE.md`, `README.md`, `DESIGN_SYSTEM.md`, `.codex/skills/portfolio-maintainer/*`).
 
 ### Template For Next Entries
 - `YYYY-MM-DD`

@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJsonFile, writeJsonFile } from "@/lib/data";
+import {
+  getProject,
+  updateProject,
+  deleteProject,
+} from "@/lib/data";
 import { authenticateRequest } from "@/lib/api-auth";
 import { Project } from "@/lib/types";
 import { normalizeProject } from "@/lib/project-normalizers";
@@ -12,10 +16,12 @@ function projectImageCandidates(project: Project): string[] {
   return paths;
 }
 
-export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function GET(
+  _req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   const { id } = await params;
-  const projects = await readJsonFile<Project[]>("projects.json");
-  const project = projects.find((p) => p.id === id);
+  const project = await getProject(id);
 
   if (!project) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
@@ -24,46 +30,50 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ id:
   return NextResponse.json(normalizeProject(project));
 }
 
-export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function PUT(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   if (!(await authenticateRequest(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id } = await params;
   const body = await req.json();
-  const projects = await readJsonFile<Project[]>("projects.json");
-  const index = projects.findIndex((p) => p.id === id);
 
-  if (index === -1) {
+  const before = await getProject(id);
+  if (!before) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const before = projects[index];
-  const next = normalizeProject({ ...before, ...body, id });
-  projects[index] = next;
-  await writeJsonFile("projects.json", projects);
-  void removeImagesIfUnused(projectImageCandidates(before));
+  const normalized = normalizeProject({ ...before, ...body, id });
+  const next = await updateProject(id, normalized);
 
+  if (!next) {
+    return NextResponse.json({ error: "Update failed" }, { status: 500 });
+  }
+
+  void removeImagesIfUnused(projectImageCandidates(before));
   return NextResponse.json(next);
 }
 
-export async function DELETE(req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
+export async function DELETE(
+  req: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   if (!(await authenticateRequest(req))) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
   const { id } = await params;
-  const projects = await readJsonFile<Project[]>("projects.json");
-  const target = projects.find((p) => p.id === id);
-  const filtered = projects.filter((p) => p.id !== id);
+  const target = await getProject(id);
 
-  if (filtered.length === projects.length) {
+  if (!target) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  await writeJsonFile("projects.json", filtered);
-  if (target) {
-    void removeImagesIfUnused(projectImageCandidates(target));
-  }
+  await deleteProject(id);
+
+  void removeImagesIfUnused(projectImageCandidates(target));
   return NextResponse.json({ success: true });
 }

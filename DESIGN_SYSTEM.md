@@ -173,7 +173,7 @@ Title with one gradient-highlighted word
 ### Services Icons
 Supported icon source values:
 - Font Awesome key (for example `FaCode`)
-- Uploaded image path (for example `/images/services/...`)
+- Supabase Storage URL (for example `https://<ref>.supabase.co/storage/v1/object/public/images/services/...`)
 
 ---
 
@@ -303,7 +303,7 @@ Anchors: `#about`, `#services`, `#portfolio`, `#certifications`, `#contact`.
   - Certifications: mini thumbnail + provider palette swatch/code + `🖼/📄/🔗` chips + quick open links.
   - Preview actions always open in a new tab (`target="_blank"` + `rel="noopener noreferrer"`).
   - `attachments` preview is conditional and shown only when data exists.
-- Media lifecycle policy: when image references are removed in admin data, unreferenced files are automatically cleaned from `public/images` (default placeholders are protected).
+- Media lifecycle policy: when image references are removed in admin data, unreferenced files are automatically cleaned from Supabase Storage.
 
 ---
 
@@ -360,7 +360,9 @@ Anchors: `#about`, `#services`, `#portfolio`, `#certifications`, `#contact`.
 - Analytics components: `src/components/analytics/*`
 - Analytics capture helper: `src/lib/analytics.ts`
 - Data models: `src/lib/types.ts`
-- Content data: `data/*.json`
+- Supabase client: `src/lib/supabase.ts`
+- Data layer (Supabase CRUD): `src/lib/data.ts`
+- Legacy content data (reference): `data/*.json`
 
 ---
 

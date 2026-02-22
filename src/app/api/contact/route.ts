@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import nodemailer from "nodemailer";
 import { normalizeContactMessage } from "@/lib/contact-message-normalizers";
+import { createContactSubmission } from "@/lib/data";
 
 export const runtime = "nodejs";
 
@@ -36,6 +37,18 @@ export async function POST(req: NextRequest) {
     }
     if (normalizedMessage.text.length > 5000) {
       return NextResponse.json({ error: "Message is too long" }, { status: 400 });
+    }
+
+    try {
+      await createContactSubmission({
+        name,
+        email,
+        subject,
+        messageText: normalizedMessage.text,
+        messageHtml: normalizedMessage.html,
+      });
+    } catch (err) {
+      console.error("Failed to store contact submission:", err);
     }
 
     const { host, port, secure, user, pass, to } = getEmailConfig();

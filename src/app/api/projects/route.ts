@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJsonFile, writeJsonFile } from "@/lib/data";
+import { getProjects, createProject } from "@/lib/data";
 import { authenticateRequest } from "@/lib/api-auth";
 import { Project } from "@/lib/types";
 import crypto from "crypto";
 import { normalizeProject, normalizeProjects } from "@/lib/project-normalizers";
 
 export async function GET() {
-  const projects = await readJsonFile<Project[]>("projects.json");
+  const projects = await getProjects();
   return NextResponse.json(normalizeProjects(projects));
 }
 
@@ -16,7 +16,7 @@ export async function POST(req: NextRequest) {
   }
 
   const body = await req.json();
-  const projects = await readJsonFile<Project[]>("projects.json");
+  const projects = await getProjects();
 
   const newProject: Project = normalizeProject({
     id: `proj-${crypto.randomUUID().slice(0, 8)}`,
@@ -33,8 +33,6 @@ export async function POST(req: NextRequest) {
     order: body.order ?? projects.length + 1,
   });
 
-  projects.push(newProject);
-  await writeJsonFile("projects.json", projects);
-
-  return NextResponse.json(newProject, { status: 201 });
+  const saved = await createProject(newProject);
+  return NextResponse.json(saved, { status: 201 });
 }

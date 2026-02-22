@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
-import { readJsonFile, writeJsonFile } from "@/lib/data";
+import { getProfile, updateProfile } from "@/lib/data";
 import { authenticateRequest } from "@/lib/api-auth";
 import { Profile } from "@/lib/types";
 import { normalizeProfileData } from "@/lib/profile-normalizers";
 import { removeImagesIfUnused } from "@/lib/media-cleanup";
 
 export async function GET() {
-  const profile = await readJsonFile<Partial<Profile>>("profile.json");
+  const profile = await getProfile();
   return NextResponse.json(normalizeProfileData(profile));
 }
 
@@ -15,11 +15,11 @@ export async function PUT(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const current = await readJsonFile<Partial<Profile>>("profile.json");
+  const current = await getProfile();
   const incoming = (await req.json()) as Partial<Profile>;
   const profile = normalizeProfileData({ ...current, ...incoming });
 
-  await writeJsonFile("profile.json", profile);
+  const saved = await updateProfile(profile);
 
   const oldImages: string[] = [];
   if (current.profilePhoto && current.profilePhoto !== profile.profilePhoto) {
@@ -32,5 +32,5 @@ export async function PUT(req: NextRequest) {
     void removeImagesIfUnused(oldImages);
   }
 
-  return NextResponse.json(profile);
+  return NextResponse.json(saved);
 }

@@ -5,8 +5,8 @@ A personal portfolio + admin CMS built with Next.js App Router, TypeScript, and 
 ## Overview
 - Public site sections: Hero/About, Services, Recent Works, Certifications, Contact
 - Admin dashboard for content management: profile, services, projects, certifications, categories
-- Data persistence via local JSON files in `data/`
-- Upload pipeline for images under `public/images/<category>/`
+- Data persistence via Supabase (Postgres tables + Storage bucket for images)
+- Contact form submissions stored in Supabase `contact_submissions` table + SMTP email
 
 ## Runbook
 ```bash
@@ -21,6 +21,9 @@ Set these in `.env`:
 
 - `JWT_SECRET`
 - `ADMIN_PASSWORD_HASH` (preferred) or `ADMIN_PASSWORD`
+- `NEXT_PUBLIC_SUPABASE_URL` (Supabase project URL)
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Supabase anon/public key)
+- `SUPABASE_SERVICE_ROLE_KEY` (Supabase service role key)
 - `CONTACT_TO_EMAIL`
 - `SMTP_HOST`
 - `SMTP_PORT`
@@ -36,12 +39,19 @@ Contact semantics:
 - `CONTACT_DRY_RUN=true` is explicit opt-in for local testing only.
 - If SMTP config is missing, contact API returns service-unavailable error.
 
-## Data Files and Contracts
-- `data/profile.json` -> profile/about/hero data
-- `data/services.json` -> services list
-- `data/projects.json` -> projects content, media, categories
-- `data/project-categories.json` -> ordered category chips source
-- `data/certifications.json` -> certifications, provider palette, metadata
+## Data Layer (Supabase)
+- `profile` table (singleton row) -> profile/about/hero data
+- `services` table -> services list
+- `projects` table -> projects content, media, categories
+- `project_categories` table -> ordered category chips source
+- `certifications` table -> certifications, provider palette, metadata
+- `contact_submissions` table -> contact form submission log
+- `images` Storage bucket -> all uploaded images (profile, projects, services, certifications)
+
+### Supabase Setup (for new environments)
+1. Run `scripts/supabase-migration.sql` in the Supabase Dashboard SQL Editor
+2. Run `npx tsx scripts/setup-supabase.ts` to create the storage bucket and verify tables
+3. Run `npx tsx scripts/migrate-to-supabase.ts` to seed data from legacy `data/*.json` files
 
 ## Feature Map
 Admin pages and related APIs:
@@ -64,5 +74,5 @@ Admin pages and related APIs:
 ## Notes
 - Tailwind-only styling (no Bootstrap).
 - Keep admin edit flow, API normalization, and public rendering aligned when adding fields.
-- Removed/replaced images are cleaned automatically when they are no longer referenced by data (protected placeholders are retained).
+- Removed/replaced images are cleaned automatically from Supabase Storage when they are no longer referenced by database records.
 - Browser tab icon: replace `src/app/icon.png` (Next.js file-based metadata). Do not add a `favicon.ico` alongside it — browsers prioritize `.ico` over `.png`.

@@ -40,3 +40,10 @@
 - Confirm all Supabase env vars are set (`NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`).
 - If schema changed: update `scripts/supabase-migration.sql` and run new DDL in Supabase Dashboard.
 - If new table added: add RLS SELECT policy for `anon` role.
+
+10. Authentication
+- Confirm admin user exists in Supabase Auth (create via `npx tsx scripts/create-admin-user.ts <email> <password>` if needed).
+- Confirm login flow works end-to-end: `/admin/login` → `/api/auth/login` → Supabase session cookie set → admin pages accessible.
+- Confirm logout clears session: sidebar logout → `/api/auth/logout` → redirect to login.
+- Confirm middleware (`src/proxy.ts`) redirects unauthenticated requests to `/admin/login`.
+- Confirm all protected API routes call `authenticateRequest()` (no `req` parameter) and return 401 on failure.

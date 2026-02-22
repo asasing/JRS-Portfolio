@@ -19,8 +19,6 @@ npm run lint
 ## Environment Variables
 Set these in `.env`:
 
-- `JWT_SECRET`
-- `ADMIN_PASSWORD_HASH` (preferred) or `ADMIN_PASSWORD`
 - `NEXT_PUBLIC_SUPABASE_URL` (Supabase project URL)
 - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Supabase anon/public key)
 - `SUPABASE_SERVICE_ROLE_KEY` (Supabase service role key)
@@ -52,6 +50,7 @@ Contact semantics:
 1. Run `scripts/supabase-migration.sql` in the Supabase Dashboard SQL Editor
 2. Run `npx tsx scripts/setup-supabase.ts` to create the storage bucket and verify tables
 3. Run `npx tsx scripts/migrate-to-supabase.ts` to seed data from legacy `data/*.json` files
+4. Create admin user: `npx tsx scripts/create-admin-user.ts <email> <password>`
 
 ## Feature Map
 Admin pages and related APIs:

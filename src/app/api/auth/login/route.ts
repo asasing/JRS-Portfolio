@@ -1,55 +1,37 @@
 import { NextRequest, NextResponse } from "next/server";
-import { verifyPassword, signToken } from "@/lib/auth";
+import { createSupabaseServerClient } from "@/lib/supabase";
 
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const inputPassword = typeof body?.password === "string" ? body.password.trim() : "";
+    const email = typeof body?.email === "string" ? body.email.trim() : "";
+    const password = typeof body?.password === "string" ? body.password : "";
 
-    if (!inputPassword) {
-      return NextResponse.json({ error: "Password required" }, { status: 400 });
+    if (!email || !password) {
+      return NextResponse.json(
+        { error: "Email and password required" },
+        { status: 400 }
+      );
     }
 
-    const hashedPassword = process.env.ADMIN_PASSWORD_HASH?.trim().replace(/^"(.*)"$/, "$1");
-    const plainPassword =
-      process.env.ADMIN_PASSWORD?.trim() ||
-      process.env.password?.trim();
-
-    if (!hashedPassword && !plainPassword) {
-      return NextResponse.json({ error: "Server misconfigured" }, { status: 500 });
-    }
-
-    let valid = false;
-
-    if (hashedPassword) {
-      try {
-        valid = await verifyPassword(inputPassword, hashedPassword);
-      } catch {
-        valid = false;
-      }
-    }
-
-    if (!valid && plainPassword) {
-      valid = inputPassword === plainPassword;
-    }
-
-    if (!valid) {
-      return NextResponse.json({ error: "Invalid password" }, { status: 401 });
-    }
-
-    const token = await signToken({ role: "admin" });
-
-    const response = NextResponse.json({ success: true });
-    response.cookies.set("admin_token", token, {
-      httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      maxAge: 60 * 60 * 24, // 24 hours
-      path: "/",
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
     });
 
-    return response;
+    if (error || !data.session) {
+      return NextResponse.json(
+        { error: "Invalid email or password" },
+        { status: 401 }
+      );
+    }
+
+    return NextResponse.json({ success: true });
   } catch {
-    return NextResponse.json({ error: "Internal server error" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
   }
 }

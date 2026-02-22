@@ -215,7 +215,7 @@ Supported icon source values:
 [Native horizontal rail on desktop with overlay edge arrows]
 ```
 
-- Filter chips are driven by admin-managed project categories (`project-categories.json`).
+- Filter chips are driven by admin-managed project categories (`project_categories` Supabase table).
 - Clicking an already active category toggles back to `All`.
 - View mode defaults to horizontal rail; `Expand` switches to grid and `Shrink` restores rail mode.
 - Desktop rail supports native horizontal scroll (trackpad/wheel/swipe) plus left/right overlay controls.
@@ -366,10 +366,9 @@ Anchors: `#about`, `#services`, `#portfolio`, `#certifications`, `#contact`.
 
 ---
 
-## Admin Default Credentials
+## Admin Authentication
 
-- Password: `admin123` (change in production)
+- Auth provider: Supabase Auth (email + password)
 - Login URL: `/admin/login`
-- Password hash stored in `.env` as `ADMIN_PASSWORD_HASH`
-- Change password command:
-  `node -e "require('bcryptjs').hash('YOUR_NEW_PASSWORD', 10).then(h => console.log(h))"`
+- Create admin user: `npx tsx scripts/create-admin-user.ts <email> <password>`
+- Password management: via Supabase Dashboard (Authentication > Users)

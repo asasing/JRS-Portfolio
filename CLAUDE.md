@@ -29,13 +29,15 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Legacy JSON content (reference only): `data/profile.json`, `data/projects.json`, `data/services.json`, `data/certifications.json`, `data/project-categories.json`
 
 ## Auth and Admin Access
-- Login API: `src/app/api/auth/login/route.ts`
-- Middleware protection: `src/middleware.ts`
-- Cookie token name: `admin_token`
-- Password env support:
-  - `ADMIN_PASSWORD_HASH` (bcrypt preferred)
-  - fallback `ADMIN_PASSWORD`
-  - fallback `password` (lowercase, legacy compatibility)
+- Authentication: Supabase Auth (email + password)
+- Login API: `src/app/api/auth/login/route.ts` — calls `supabase.auth.signInWithPassword()`
+- Logout API: `src/app/api/auth/logout/route.ts` — calls `supabase.auth.signOut()`
+- Middleware protection: `src/proxy.ts` — verifies Supabase session via `supabase.auth.getUser()`
+- API auth: `src/lib/api-auth.ts` — `authenticateRequest()` verifies Supabase session (no args needed)
+- Browser client: `src/lib/supabase-browser.ts` — used by client components
+- Server auth client: `createSupabaseServerClient()` in `src/lib/supabase.ts` — cookie-based server client
+- Session management: handled automatically by Supabase via `@supabase/ssr` cookies
+- Admin user setup: `npx tsx scripts/create-admin-user.ts <email> <password>`
 
 ## Upload System
 - Upload endpoint: `POST /api/upload` (`src/app/api/upload/route.ts`)
@@ -48,7 +50,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 ## Favicon / Browser Tab Icon
 - File: `src/app/icon.png` (Next.js file-based metadata convention — auto-served, no metadata wiring needed)
 - The default `create-next-app` favicon (`src/app/favicon.ico`) was deleted and replaced.
-- Admin profile has a Browser Tab Icon uploader (stores path in `profile.json` `favicon` field, handles media cleanup), but the actual tab icon is served from the static `src/app/icon.png`.
+- Admin profile has a Browser Tab Icon uploader (stores path in `profile` table `favicon` column, handles media cleanup), but the actual tab icon is served from the static `src/app/icon.png`.
 - To change the favicon: replace `src/app/icon.png` directly.
 - Do NOT use `generateMetadata()` for favicon in root layout — Next.js caches the result and the icon does not update reliably.
 
@@ -64,9 +66,6 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `CONTACT_DRY_RUN=true` is explicit opt-in only; default expectation is real SMTP send
 
 ## Environment Variables (Current Expectations)
-- `JWT_SECRET`
-- `ADMIN_PASSWORD_HASH`
-- Optional fallback auth vars: `ADMIN_PASSWORD`, `password`
 - Supabase vars:
   - `NEXT_PUBLIC_SUPABASE_URL` (Supabase project URL)
   - `NEXT_PUBLIC_SUPABASE_ANON_KEY` (Supabase anon/public key — used for public reads)
@@ -118,7 +117,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Email is sent with both plain-text and HTML body
 
 6. Managed project categories + multi-category assignments
-- Added `project-categories.json` as ordered category source of truth
+- `project_categories` Supabase table is the ordered category source of truth
 - Projects support `categories: string[]` (canonical) while keeping legacy `category` compatibility
 - Admin/projects includes category CRUD + drag reorder + save
 - Project add/edit supports selecting multiple categories
@@ -168,6 +167,8 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 
 ## Important Files Touched Recently
 - `src/lib/supabase.ts`
+- `src/lib/supabase-browser.ts`
+- `src/lib/api-auth.ts`
 - `src/lib/data.ts`
 - `src/lib/analytics.ts`
 - `src/components/analytics/PostHogProvider.tsx`
@@ -221,6 +222,12 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `scripts/supabase-migration.sql`
 - `scripts/setup-supabase.ts`
 - `scripts/migrate-to-supabase.ts`
+- `scripts/create-admin-user.ts`
+- `src/proxy.ts`
+- `src/app/api/auth/login/route.ts`
+- `src/app/api/auth/logout/route.ts`
+- `src/app/admin/login/page.tsx`
+- `src/components/admin/Sidebar.tsx`
 
 ## Known Issues / Caveats
 - `npm run lint` currently fails on existing rule `react-hooks/set-state-in-effect` in multiple files:
@@ -338,7 +345,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Updated `src/lib/media-cleanup.ts` to track favicon as a referenced image path.
 - Updated `src/app/api/profile/route.ts` to clean up old favicon image on replacement.
 - Reverted `src/app/layout.tsx` to static `metadata` export (removed `generateMetadata()` and `force-dynamic` — dynamic metadata was unreliable for favicons due to Next.js caching; the file-based `icon.png` approach is more reliable).
-- **Caveat**: The admin favicon uploader stores the path in `profile.json` and handles media cleanup, but the actual browser tab icon is served from the static `src/app/icon.png` file. To change the favicon, replace `src/app/icon.png` directly. A future improvement could wire the admin-uploaded favicon to overwrite `src/app/icon.png` at save time.
+- **Caveat**: The admin favicon uploader stores the path in the `profile` table `favicon` column and handles media cleanup, but the actual browser tab icon is served from the static `src/app/icon.png` file. To change the favicon, replace `src/app/icon.png` directly. A future improvement could wire the admin-uploaded favicon to overwrite `src/app/icon.png` at save time.
 
 ### 2026-02-22 (Supabase Migration)
 - Migrated entire data layer from local JSON files (`data/*.json`) + filesystem images (`public/images/`) to Supabase Postgres + Supabase Storage.
@@ -356,6 +363,23 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Created data migration script (`scripts/migrate-to-supabase.ts`): seeds all existing JSON data into Supabase tables and uploads 40 local images to Supabase Storage with URL rewriting.
 - Added env vars: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`.
 - Updated all documentation files (`CLAUDE.md`, `README.md`, `DESIGN_SYSTEM.md`, `.codex/skills/portfolio-maintainer/*`).
+
+### 2026-02-22 (Supabase Auth Migration)
+- Migrated admin authentication from env-var + custom JWT to Supabase Auth (email + password).
+- Installed `@supabase/ssr` for cookie-based server auth.
+- Created `src/lib/supabase-browser.ts` (client-side Supabase instance via `createBrowserClient`).
+- Updated `src/lib/supabase.ts` with `createSupabaseServerClient()` using `createServerClient` + `cookies()`.
+- Rewrote `src/app/api/auth/login/route.ts` to use `supabase.auth.signInWithPassword()`.
+- Created `src/app/api/auth/logout/route.ts` with `supabase.auth.signOut()`.
+- Rewrote `src/lib/api-auth.ts`: `authenticateRequest()` now verifies Supabase session via `getUser()` (no `req` param).
+- Rewrote `src/proxy.ts` middleware to use Supabase session verification instead of custom JWT.
+- Updated `src/app/admin/login/page.tsx` with email + password fields.
+- Updated `src/components/admin/Sidebar.tsx` logout to call `POST /api/auth/logout`.
+- Deleted `src/lib/auth.ts` (bcrypt + jose no longer needed).
+- Removed `bcryptjs`, `jose`, `@types/bcryptjs` dependencies.
+- Commented out `JWT_SECRET`, `ADMIN_PASSWORD_HASH`, `password` env vars.
+- Created `scripts/create-admin-user.ts` for one-time admin user provisioning.
+- Updated all API routes: `authenticateRequest(req)` -> `authenticateRequest()`.
 
 ### Template For Next Entries
 - `YYYY-MM-DD`

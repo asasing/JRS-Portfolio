@@ -11,7 +11,7 @@ export async function GET() {
 }
 
 export async function PUT(req: NextRequest) {
-  if (!(await authenticateRequest(req))) {
+  if (!(await authenticateRequest())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

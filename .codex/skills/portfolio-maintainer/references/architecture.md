@@ -20,6 +20,15 @@
 - `contact_submissions`: public INSERT for `anon` role
 - `service_role` bypasses RLS entirely (used by admin API routes)
 
+## Authentication
+- Provider: Supabase Auth (email + password)
+- Login: `src/app/api/auth/login/route.ts` → `supabase.auth.signInWithPassword()`
+- Logout: `src/app/api/auth/logout/route.ts` → `supabase.auth.signOut()`
+- Middleware: `src/proxy.ts` — verifies Supabase session, redirects unauthenticated to `/admin/login`
+- API auth: `src/lib/api-auth.ts` → `authenticateRequest()` verifies session via `supabase.auth.getUser()`
+- Browser client: `src/lib/supabase-browser.ts` — used by client components
+- Server client: `createSupabaseServerClient()` in `src/lib/supabase.ts` — cookie-based via `@supabase/ssr`
+
 ## Core Areas
 - Public app routes: `src/app/page.tsx`, `src/components/portfolio/*`
 - Admin UI: `src/app/admin/*`

@@ -47,7 +47,7 @@ export async function PUT(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await authenticateRequest(req))) {
+  if (!(await authenticateRequest())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -93,7 +93,7 @@ export async function DELETE(
   req: NextRequest,
   { params }: { params: Promise<{ id: string }> }
 ) {
-  if (!(await authenticateRequest(req))) {
+  if (!(await authenticateRequest())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

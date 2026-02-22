@@ -1,13 +1,13 @@
-import { NextRequest } from "next/server";
-import { verifyToken } from "./auth";
+import { createSupabaseServerClient } from "@/lib/supabase";
 
-export async function authenticateRequest(req: NextRequest): Promise<boolean> {
-  const cookie = req.cookies.get("admin_token");
-  const authHeader = req.headers.get("authorization");
-
-  const token = cookie?.value || authHeader?.replace("Bearer ", "");
-  if (!token) return false;
-
-  const payload = await verifyToken(token);
-  return payload !== null;
+export async function authenticateRequest(): Promise<boolean> {
+  try {
+    const supabase = await createSupabaseServerClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+    return user !== null;
+  } catch {
+    return false;
+  }
 }

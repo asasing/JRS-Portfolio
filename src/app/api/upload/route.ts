@@ -4,7 +4,7 @@ import { supabaseAdmin, getImagePublicUrl } from "@/lib/supabase";
 import crypto from "crypto";
 
 export async function POST(req: NextRequest) {
-  if (!(await authenticateRequest(req))) {
+  if (!(await authenticateRequest())) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 

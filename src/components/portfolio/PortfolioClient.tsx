@@ -16,6 +16,7 @@ import Projects from "./Projects";
 import Certifications from "./Certifications";
 import Contact from "./Contact";
 import Footer from "./Footer";
+import SectionTracker from "@/components/analytics/SectionTracker";
 
 interface PortfolioClientProps {
   profile: Profile;
@@ -37,6 +38,7 @@ export default function PortfolioClient({
   return (
     <>
       <Preloader isLoading={isLoading} />
+      <SectionTracker />
       <Header />
       <main className="w-full">
         <HeroAbout profile={profile} />

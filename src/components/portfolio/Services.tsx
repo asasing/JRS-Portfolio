@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import Image from "next/image";
 import { Service } from "@/lib/types";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
@@ -42,6 +43,29 @@ export default function Services({ services }: ServicesProps) {
   );
 }
 
+function renderDescription(text: string): React.ReactNode {
+  const blocks = text.split(/\n\n+/);
+  return blocks.map((block, i) => {
+    const lines = block.split("\n").filter((l) => l.length > 0);
+    const isBulletBlock = lines.length > 0 && lines.every((l) => l.trimStart().startsWith("•"));
+    if (isBulletBlock) {
+      return (
+        <ul key={i}>
+          {lines.map((line, j) => (
+            <li key={j}>{line.replace(/^\s*•\s*/, "")}</li>
+          ))}
+        </ul>
+      );
+    }
+    return <p key={i}>{lines.map((line, j) => (
+      <React.Fragment key={j}>
+        {j > 0 && <br />}
+        {line}
+      </React.Fragment>
+    ))}</p>;
+  });
+}
+
 function ServiceCard({ service }: { service: Service }) {
   const { ref, isVisible } = useScrollReveal(0.2);
   const iconValue = service.icon?.trim() || "";
@@ -73,7 +97,9 @@ function ServiceCard({ service }: { service: Service }) {
         </span>
         <h3 className="text-base font-semibold leading-snug text-text-primary md:text-lg">{service.title}</h3>
       </div>
-      <p className="text-sm leading-relaxed text-text-secondary md:text-[0.95rem]">{service.description}</p>
+      <div className="bio-content text-sm leading-relaxed text-text-secondary md:text-[0.95rem]">
+        {renderDescription(service.description)}
+      </div>
     </div>
   );
 }

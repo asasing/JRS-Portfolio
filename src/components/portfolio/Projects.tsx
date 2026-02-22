@@ -8,6 +8,7 @@ import SectionHeading from "./SectionHeading";
 import ProjectDetail from "./ProjectDetail";
 import { FaChevronLeft, FaChevronRight, FaExpand, FaCompress } from "react-icons/fa";
 import { DEFAULT_PROJECT_THUMBNAIL } from "@/lib/constants";
+import { capture } from "@/lib/analytics";
 
 interface ProjectsProps {
   projects: Project[];
@@ -142,7 +143,11 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
   }, [activeCategory]);
 
   const handleCategoryChange = (category: string) => {
-    setActiveCategory((prev) => (prev === category ? "All" : category));
+    setActiveCategory((prev) => {
+      const next = prev === category ? "All" : category;
+      capture("project_category_filtered", { category: next });
+      return next;
+    });
   };
 
   return (
@@ -152,7 +157,11 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
           <SectionHeading overline="PORTFOLIO" title="Recent Works" gradientWord="Works" />
           <button
             type="button"
-            onClick={() => setViewMode((prev) => (prev === "rail" ? "grid" : "rail"))}
+            onClick={() => setViewMode((prev) => {
+              const next = prev === "rail" ? "grid" : "rail";
+              capture("project_view_mode_toggled", { mode: next });
+              return next;
+            })}
             className="pill-button border border-border-subtle text-xs sm:text-sm text-text-secondary hover:text-text-primary hover:border-accent-purple/50 transition-colors cursor-pointer self-start md:self-auto"
             aria-label={viewMode === "rail" ? "Switch to grid view" : "Switch to rail view"}
           >
@@ -192,7 +201,14 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
                 key={`grid-${project.id}`}
                 project={project}
                 mode="grid"
-                onClick={() => setSelectedProject(project)}
+                onClick={() => {
+                  capture("project_card_clicked", {
+                    project_id: project.id,
+                    project_title: project.title,
+                    categories: getProjectCategories(project).join(", "),
+                  });
+                  setSelectedProject(project);
+                }}
               />
             ))}
           </div>
@@ -207,7 +223,14 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
                   <ProjectCard
                     project={project}
                     mode="grid"
-                    onClick={() => setSelectedProject(project)}
+                    onClick={() => {
+                      capture("project_card_clicked", {
+                        project_id: project.id,
+                        project_title: project.title,
+                        categories: getProjectCategories(project).join(", "),
+                      });
+                      setSelectedProject(project);
+                    }}
                   />
                 </div>
               ))}
@@ -229,7 +252,14 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
                       <ProjectCard
                         project={project}
                         mode="rail"
-                        onClick={() => setSelectedProject(project)}
+                        onClick={() => {
+                          capture("project_card_clicked", {
+                            project_id: project.id,
+                            project_title: project.title,
+                            categories: getProjectCategories(project).join(", "),
+                          });
+                          setSelectedProject(project);
+                        }}
                       />
                     </div>
                   ))}

@@ -1,11 +1,12 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Profile } from "@/lib/types";
 import SectionHeading from "./SectionHeading";
 import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import RichTextEditor from "@/components/admin/RichTextEditor";
+import { capture } from "@/lib/analytics";
 
 interface ContactProps {
   profile: Profile;
@@ -20,11 +21,20 @@ export default function Contact({ profile }: ContactProps) {
   });
   const [status, setStatus] = useState<"idle" | "sending" | "sent" | "error">("idle");
   const [errorMessage, setErrorMessage] = useState("Failed to send. Please try again.");
+  const formStarted = useRef(false);
+
+  const trackStart = () => {
+    if (!formStarted.current) {
+      formStarted.current = true;
+      capture("contact_form_started");
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setStatus("sending");
     setErrorMessage("Failed to send. Please try again.");
+    capture("contact_form_submitted");
 
     try {
       const res = await fetch("/api/contact", {
@@ -39,17 +49,20 @@ export default function Contact({ profile }: ContactProps) {
       });
 
       if (res.ok) {
+        capture("contact_form_success");
         setStatus("sent");
         setFormData({ name: "", email: "", subject: "", messageHtml: "" });
+        formStarted.current = false;
         setTimeout(() => setStatus("idle"), 3000);
       } else {
         const payload = (await res.json().catch(() => null)) as { error?: string } | null;
-        if (payload?.error) {
-          setErrorMessage(payload.error);
-        }
+        const msg = payload?.error ?? "Failed to send. Please try again.";
+        setErrorMessage(msg);
+        capture("contact_form_error", { error_message: msg });
         setStatus("error");
       }
     } catch {
+      capture("contact_form_error", { error_message: "Network error" });
       setStatus("error");
     }
   };
@@ -76,20 +89,20 @@ export default function Contact({ profile }: ContactProps) {
             <Input
               placeholder="Name"
               value={formData.name}
-              onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+              onChange={(e) => { trackStart(); setFormData({ ...formData, name: e.target.value }); }}
               required
             />
             <Input
               type="email"
               placeholder="Email"
               value={formData.email}
-              onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+              onChange={(e) => { trackStart(); setFormData({ ...formData, email: e.target.value }); }}
               required
             />
             <Input
               placeholder="Subject"
               value={formData.subject}
-              onChange={(e) => setFormData({ ...formData, subject: e.target.value })}
+              onChange={(e) => { trackStart(); setFormData({ ...formData, subject: e.target.value }); }}
               required
             />
           </div>
@@ -100,7 +113,7 @@ export default function Contact({ profile }: ContactProps) {
             allowImage={false}
             allowLinks
             minHeightClassName="min-h-52"
-            onChange={(messageHtml) => setFormData({ ...formData, messageHtml })}
+            onChange={(messageHtml) => { trackStart(); setFormData({ ...formData, messageHtml }); }}
           />
           <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="text-sm">

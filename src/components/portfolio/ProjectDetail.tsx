@@ -7,6 +7,7 @@ import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import { FaChevronLeft, FaChevronRight, FaTimes, FaExternalLinkAlt } from "react-icons/fa";
 import { DEFAULT_PROJECT_THUMBNAIL } from "@/lib/constants";
+import { capture } from "@/lib/analytics";
 
 interface ProjectDetailProps {
   project: Project;
@@ -112,7 +113,17 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
 
           <div className="flex flex-wrap gap-3">
             {project.links.map((link) => (
-              <a key={link.label} href={link.url} target="_blank" rel="noopener noreferrer">
+              <a
+                key={link.label}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => capture("project_link_clicked", {
+                  project_id: project.id,
+                  project_title: project.title,
+                  link_label: link.label,
+                })}
+              >
                 <Button variant="outline" size="sm">
                   <span className="flex items-center gap-2">
                     {link.label}

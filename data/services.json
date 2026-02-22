@@ -2,8 +2,8 @@
   {
     "id": "svc-001",
     "number": "01/",
-    "title": "Power Platform Development",
-    "description": "Building enterprise-grade apps and automations with Power Apps (Canvas & Model-Driven), Power Automate, Power Pages, and Dataverse \u2014 fully integrated with Microsoft 365 and 3rd Party APIs (if applicable).",
+    "title": "Power Platform & Business Systems Engineering",
+    "description": "Designing secure, scalable business systems using Microsoft Power Platform (Power Apps, Dataverse, Power Automate, Power Pages), fully integrated with Microsoft 365, Azure, and external APIs.\n\nI architect solutions that replace spreadsheets, manual processes, and disconnected tools with governed, auditable, enterprise-ready platforms.\n\n• Replace manual Excel-based processes\n• Build auditable internal CRMs\n• Create secure customer portals\n• Automate approval workflows\n• Improve reporting and operational visibility",
     "icon": "/images/services/eaa08ce3-1771521655333.png",
     "order": 1
   },
@@ -11,7 +11,7 @@
     "id": "svc-002",
     "number": "02/",
     "title": "AI & Intelligent Automation",
-    "description": "Designing AI-powered workflows using Azure AI Services, OpenAI/LLM integrations, Microsoft Copilot Studio, n8n, and RPA \u2014 reducing manual effort and enabling smarter business decisions.",
+    "description": "Implementing AI-driven automation using Azure AI Services, OpenAI/LLM integrations, Anthropic, Microsoft Copilot Studio, and RPA.\n\nI help organizations reduce repetitive work, unlock data insights, and embed intelligent decision support directly into their operations.",
     "icon": "/images/services/724ad9ec-1771521662280.png",
     "order": 2
   },
@@ -19,8 +19,24 @@
     "id": "svc-003",
     "number": "03/",
     "title": "Custom Application Development",
-    "description": "I design and build tailor-fit business applications that align with your workflows, goals, and growth plans. Whether you need an internal system, client-facing portal, or a fully customized operational platform, I develop scalable and secure solutions using modern low-code and full-code technologies.\n\nFrom concept to deployment, I handle architecture, development, automation, integrations, and ongoing support. My focus is on delivering systems that reduce manual work, improve visibility, and create measurable business value.",
+    "description": "Architecting and developing tailored business applications, from internal systems and client portals to full operational platforms.\n\nUsing a hybrid low-code + full-code approach (React, Supabase, Azure, APIs), I deliver scalable, secure solutions aligned with your long-term growth strategy.\n\nFrom discovery to deployment, I handle architecture, integrations, automation, and post-launch optimization, ensuring measurable business impact.",
     "icon": "FaCode",
     "order": 3
+  },
+  {
+    "id": "svc-1771751163284",
+    "number": "04/",
+    "title": "Solution Architecture & System Design",
+    "description": "Designing end-to-end solution architectures across Power Platform, Azure, and modern web technologies.\n\nI provide high-level designs, data architecture, governance models, integration strategies, and cost optimization plans — ensuring systems are scalable, secure, and future-ready.",
+    "icon": "/images/services/783f5455-1771751308741.png",
+    "order": 4
+  },
+  {
+    "id": "svc-1771751324974",
+    "number": "05/",
+    "title": "Automation & Integration Consulting",
+    "description": "Connecting systems and eliminating operational silos through API integrations, workflow automation, and data migration strategies.\n\nI specialize in integrating legacy systems, third-party services, Microsoft ecosystem tools, and custom platforms into a unified digital backbone.",
+    "icon": "FaCode",
+    "order": 5
   }
 ]

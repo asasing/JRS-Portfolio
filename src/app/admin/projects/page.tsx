@@ -10,6 +10,12 @@ import DeleteDialog from "@/components/admin/DeleteDialog";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import MultiImageUploader from "@/components/admin/MultiImageUploader";
 import {
+  collectProjectFilePreviews,
+  collectProjectImagePreviews,
+  collectProjectLinkPreviews,
+  normalizeUrlForOpen,
+} from "@/lib/admin-preview";
+import {
   DndContext,
   DragEndEvent,
   KeyboardSensor,
@@ -35,6 +41,8 @@ import {
   FaSave,
   FaImage,
   FaCheck,
+  FaPaperclip,
+  FaExternalLinkAlt,
 } from "react-icons/fa";
 import { DEFAULT_PROJECT_THUMBNAIL } from "@/lib/constants";
 
@@ -50,6 +58,7 @@ const emptyProject: ProjectFormState = {
   thumbnailFocusY: 50,
   thumbnailZoom: 1,
   gallery: [],
+  attachments: [],
   links: [],
   order: 0,
 };
@@ -196,6 +205,12 @@ function SortableProjectRow({ project, onEdit, onDelete }: SortableProjectRowPro
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: project.id,
   });
+  const imagePreviews = collectProjectImagePreviews(project);
+  const filePreviews = collectProjectFilePreviews(project);
+  const linkPreviews = collectProjectLinkPreviews(project);
+  const firstImage = imagePreviews[0];
+  const firstFile = filePreviews[0];
+  const firstLink = linkPreviews[0];
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -220,9 +235,56 @@ function SortableProjectRow({ project, onEdit, onDelete }: SortableProjectRowPro
         <FaGripVertical size={12} />
       </button>
 
-      <div>
-        <p className="text-sm font-medium text-text-primary">{project.title}</p>
-        <p className="text-xs text-text-muted mt-1">{projectCategoryLabel(project)}</p>
+      <div className="min-w-0">
+        <p className="text-sm font-medium text-text-primary truncate">{project.title}</p>
+        <p className="text-xs text-text-muted mt-1 truncate">{projectCategoryLabel(project)}</p>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {firstImage ? (
+            <div className="admin-mini-thumb relative">
+              <Image src={firstImage} alt={`${project.title} preview`} fill className="object-cover" sizes="32px" />
+            </div>
+          ) : (
+            <span className="admin-mini-thumb inline-flex items-center justify-center text-[10px] text-text-muted">N/A</span>
+          )}
+          <span className="admin-meta-chip">🖼 {imagePreviews.length}</span>
+          <span className="admin-meta-chip">📄 {filePreviews.length}</span>
+          <span className="admin-meta-chip">🔗 {linkPreviews.length}</span>
+          {!firstImage && !firstFile && !firstLink && (
+            <span className="text-[11px] text-text-muted">No media/links</span>
+          )}
+        </div>
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {firstImage && (
+            <a
+              href={firstImage}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-preview-row"
+            >
+              Open image
+            </a>
+          )}
+          {firstFile && (
+            <a
+              href={firstFile.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-preview-row"
+            >
+              Open file
+            </a>
+          )}
+          {firstLink && (
+            <a
+              href={firstLink.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-preview-row"
+            >
+              Open link
+            </a>
+          )}
+        </div>
       </div>
 
       <span className="text-xs text-text-muted">#{project.order}</span>
@@ -325,6 +387,7 @@ export default function AdminProjects() {
       thumbnailFocusY: 50,
       thumbnailZoom: 1,
       gallery: normalizedMedia.gallery,
+      attachments: Array.isArray(project.attachments) ? project.attachments : [],
       links: project.links,
       order: project.order,
     });
@@ -584,6 +647,9 @@ export default function AdminProjects() {
 
   const sortedProjectCategories = [...projectCategories].sort((a, b) => a.order - b.order);
   const sortedProjects = [...projects].sort((a, b) => a.order - b.order);
+  const formImagePreviews = collectProjectImagePreviews(formData);
+  const formFilePreviews = collectProjectFilePreviews(formData);
+  const formLinkPreviews = collectProjectLinkPreviews(formData);
 
   return (
     <div>
@@ -801,7 +867,7 @@ export default function AdminProjects() {
               </div>
               <div className="space-y-2">
                 {formData.links.map((link, i) => (
-                  <div key={i} className="flex gap-2">
+                  <div key={i} className="flex gap-2 items-center">
                     <Input placeholder="Label" value={link.label} onChange={(e) => {
                       const links = [...formData.links];
                       links[i] = { ...links[i], label: e.target.value };
@@ -812,11 +878,98 @@ export default function AdminProjects() {
                       links[i] = { ...links[i], url: e.target.value };
                       setFormData({ ...formData, links });
                     }} />
+                    {normalizeUrlForOpen(link.url) ? (
+                      <a
+                        href={normalizeUrlForOpen(link.url)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="admin-preview-row shrink-0"
+                      >
+                        <FaExternalLinkAlt size={10} />
+                        Open
+                      </a>
+                    ) : (
+                      <span className="admin-preview-row shrink-0 opacity-40" aria-disabled="true">
+                        <FaExternalLinkAlt size={10} />
+                        Open
+                      </span>
+                    )}
                     <button onClick={() => removeLink(i)} className="text-text-muted hover:text-accent-pink cursor-pointer px-2">
                       <FaTimes size={12} />
                     </button>
                   </div>
                 ))}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-border-subtle bg-bg-input p-4">
+              <h3 className="text-sm font-medium text-text-primary mb-3">Preview</h3>
+
+              <div className="mb-3">
+                <p className="text-xs uppercase tracking-wider text-text-muted mb-2">Image Preview</p>
+                {formImagePreviews.length > 0 ? (
+                  <div className="flex flex-wrap items-center gap-2">
+                    {formImagePreviews.slice(0, 3).map((path, index) => (
+                      <a
+                        key={`${path}-${index}`}
+                        href={path}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="admin-mini-thumb relative"
+                        title="Open image"
+                      >
+                        <Image src={path} alt={`Preview image ${index + 1}`} fill className="object-cover" sizes="32px" />
+                      </a>
+                    ))}
+                    <span className="admin-meta-chip">🖼 {formImagePreviews.length}</span>
+                  </div>
+                ) : (
+                  <p className="text-xs text-text-muted">No images attached</p>
+                )}
+              </div>
+
+              <div className="mb-3">
+                <p className="text-xs uppercase tracking-wider text-text-muted mb-2">File Preview</p>
+                {formFilePreviews.length > 0 ? (
+                  <div className="space-y-1">
+                    {formFilePreviews.map((attachment) => (
+                      <a
+                        key={attachment.id}
+                        href={attachment.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="admin-preview-row w-fit"
+                      >
+                        <FaPaperclip size={10} />
+                        {attachment.label || attachment.url}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-text-muted">No files attached</p>
+                )}
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-text-muted mb-2">Link Preview</p>
+                {formLinkPreviews.length > 0 ? (
+                  <div className="space-y-1">
+                    {formLinkPreviews.map((link, index) => (
+                      <a
+                        key={`${link.url}-${index}`}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="admin-preview-row w-fit"
+                      >
+                        <FaExternalLinkAlt size={10} />
+                        {link.label || link.url}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-text-muted">No links attached</p>
+                )}
               </div>
             </div>
 

@@ -127,6 +127,17 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Public Recent Works includes `Expand`/`Shrink` view mode (rail <-> grid).
 - Public project and certification thumbnail cards use contained-fit image rendering to avoid crop and keep stable card height.
 
+11. Admin media/link preview visibility
+- Admin projects and certifications rows now show compact media/link status chips for quick verification (`🖼/📄/🔗`).
+- Admin rows include quick-open actions for first available image/file/link.
+- Certifications rows show provider palette swatch + palette code for immediate color-context visibility.
+- Admin edit modals include live preview panels (images/files/links); preview opens in new tab only.
+
+12. Recent Works rail card uniformity + confidentiality note
+- Desktop Recent Works rail cards now use fixed-size frames (fixed basis + fixed height) to eliminate uneven card sizing while scrolling.
+- Rail cards keep fixed category/title meta area height so content length does not affect card height.
+- Added confidentiality caveat under the Recent Works heading explaining that most Power Apps and Dynamics 365 work is enterprise-confidential and only limited samples are shown.
+
 ## Important Files Touched Recently
 - `src/app/globals.css`
 - `src/components/portfolio/Services.tsx`
@@ -156,6 +167,7 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - `src/lib/types.ts`
 - `src/lib/certification-palettes.ts`
 - `src/lib/project-normalizers.ts`
+- `src/lib/admin-preview.ts`
 - `src/lib/project-category-normalizers.ts`
 - `src/lib/contact-message-normalizers.ts`
 - `src/lib/media-cleanup.ts`
@@ -249,6 +261,18 @@ It documents architecture, data flow, key decisions, and recent changes implemen
   - `src/app/api/services/route.ts`
   - `src/app/api/certifications/[id]/route.ts`
 - Executed one-time orphan cleanup and sanitized data references to avoid broken image paths.
+
+### 2026-02-22 (Admin Preview Enhancements)
+- Added shared admin preview helpers in `src/lib/admin-preview.ts` for safe preview URL normalization and preview source collection.
+- Updated admin projects row UI with mini image preview, media/link count chips, and quick-open actions.
+- Updated admin projects modal with per-link open action and consolidated Preview panel (images/files/links).
+- Updated admin certifications row UI with mini thumbnail, provider palette swatch + code, media/link chips, and quick-open actions.
+- Updated admin certifications modal with live Preview panel (thumbnail, palette, credential link, files).
+
+### 2026-02-22 (Recent Works Rail Uniformity)
+- Updated `src/components/portfolio/Projects.tsx` with rail-only fixed card wrapper sizing and rail-specific card mode.
+- Added confidentiality caveat text block below Recent Works heading.
+- Added rail layout helper classes in `src/app/globals.css` (`.project-card-rail`, `.project-card-rail__media`, `.project-card-rail__meta`).
 
 ### Template For Next Entries
 - `YYYY-MM-DD`

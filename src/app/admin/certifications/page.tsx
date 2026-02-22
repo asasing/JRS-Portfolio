@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import Image from "next/image";
 import { Certification } from "@/lib/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
@@ -31,7 +32,21 @@ import {
   resolvePaletteCodeFromProvider,
   sanitizePaletteCode,
 } from "@/lib/certification-palettes";
-import { FaPlus, FaEdit, FaTrash, FaTimes, FaGripVertical, FaSave } from "react-icons/fa";
+import {
+  collectCertificationFilePreviews,
+  collectCertificationImagePreview,
+  collectCertificationLinkPreview,
+} from "@/lib/admin-preview";
+import {
+  FaPlus,
+  FaEdit,
+  FaTrash,
+  FaTimes,
+  FaGripVertical,
+  FaSave,
+  FaExternalLinkAlt,
+  FaPaperclip,
+} from "react-icons/fa";
 
 type CertificationFormState = Omit<Certification, "id">;
 
@@ -43,6 +58,7 @@ const emptyCert: CertificationFormState = {
   credentialUrl: "",
   credentialId: "",
   thumbnail: "",
+  attachments: [],
   paletteCode: "provider-slate",
   badgeColor: "#8b5cf6",
   order: 0,
@@ -65,6 +81,11 @@ function SortableCertificationRow({ cert, onEdit, onDelete }: SortableCertificat
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({
     id: cert.id,
   });
+  const thumbnail = collectCertificationImagePreview(cert);
+  const files = collectCertificationFilePreviews(cert);
+  const credentialLink = collectCertificationLinkPreview(cert);
+  const paletteCode = sanitizePaletteCode(cert.paletteCode, cert.organization);
+  const palette = CERT_PROVIDER_PALETTES[paletteCode];
 
   const style = {
     transform: CSS.Transform.toString(transform),
@@ -89,9 +110,60 @@ function SortableCertificationRow({ cert, onEdit, onDelete }: SortableCertificat
         <FaGripVertical size={12} />
       </button>
 
-      <div>
-        <p className="text-sm font-medium text-text-primary">{cert.name}</p>
-        <p className="text-xs text-text-muted mt-1">{cert.organization} • {cert.year}</p>
+      <div className="min-w-0">
+        <div className="flex items-start gap-3">
+          {thumbnail ? (
+            <a
+              href={thumbnail}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="admin-mini-thumb relative shrink-0"
+              title="Open thumbnail"
+            >
+              <Image src={thumbnail} alt={`${cert.name} thumbnail`} fill className="object-cover" sizes="32px" />
+            </a>
+          ) : (
+            <span className="admin-mini-thumb inline-flex shrink-0 items-center justify-center text-[10px] text-text-muted">N/A</span>
+          )}
+          <div className="min-w-0">
+            <p className="text-sm font-medium text-text-primary truncate">{cert.name}</p>
+            <p className="text-xs text-text-muted mt-1 truncate">{cert.organization} • {cert.year}</p>
+          </div>
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          <span
+            className="admin-meta-chip"
+            style={{ backgroundColor: palette.bgTint, color: palette.textColor }}
+          >
+            <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: palette.textColor }} />
+            {paletteCode}
+          </span>
+          <span className="admin-meta-chip">🖼 {thumbnail ? 1 : 0}</span>
+          <span className="admin-meta-chip">📄 {files.length}</span>
+          <span className="admin-meta-chip">🔗 {credentialLink ? 1 : 0}</span>
+        </div>
+
+        <div className="mt-2 flex flex-wrap items-center gap-2">
+          {thumbnail && (
+            <a href={thumbnail} target="_blank" rel="noopener noreferrer" className="admin-preview-row">
+              Open image
+            </a>
+          )}
+          {credentialLink && (
+            <a href={credentialLink} target="_blank" rel="noopener noreferrer" className="admin-preview-row">
+              Open link
+            </a>
+          )}
+          {files[0] && (
+            <a href={files[0].url} target="_blank" rel="noopener noreferrer" className="admin-preview-row">
+              Open file
+            </a>
+          )}
+          {!thumbnail && !credentialLink && files.length === 0 && (
+            <span className="text-[11px] text-text-muted">No media/links</span>
+          )}
+        </div>
       </div>
 
       <span className="text-xs text-text-muted">#{cert.order}</span>
@@ -144,6 +216,7 @@ export default function AdminCertifications() {
       ...emptyCert,
       order: certs.length + 1,
       paletteCode: resolvePaletteCodeFromProvider(""),
+      attachments: [],
     });
     setShowForm(true);
   };
@@ -160,6 +233,7 @@ export default function AdminCertifications() {
       credentialUrl: cert.credentialUrl ?? "",
       credentialId: cert.credentialId ?? "",
       thumbnail: cert.thumbnail ?? "",
+      attachments: Array.isArray(cert.attachments) ? cert.attachments : [],
       paletteCode: sanitizePaletteCode(cert.paletteCode, cert.organization),
       badgeColor: cert.badgeColor,
       order: cert.order,
@@ -246,6 +320,11 @@ export default function AdminCertifications() {
   };
 
   const sortedCerts = [...certs].sort((a, b) => a.order - b.order);
+  const formCertThumbnail = collectCertificationImagePreview(formData);
+  const formCertFiles = collectCertificationFilePreviews(formData);
+  const formCredentialLink = collectCertificationLinkPreview(formData);
+  const formPaletteCode = sanitizePaletteCode(formData.paletteCode, formData.organization);
+  const formPalette = CERT_PROVIDER_PALETTES[formPaletteCode];
 
   return (
     <div>
@@ -361,6 +440,76 @@ export default function AdminCertifications() {
                     </button>
                   );
                 })}
+              </div>
+            </div>
+
+            <div className="rounded-xl border border-border-subtle bg-bg-input p-4">
+              <h3 className="text-sm font-medium text-text-primary mb-3">Preview</h3>
+
+              <div className="mb-3">
+                <p className="text-xs uppercase tracking-wider text-text-muted mb-2">Thumbnail</p>
+                {formCertThumbnail ? (
+                  <a
+                    href={formCertThumbnail}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="admin-mini-thumb relative inline-block"
+                  >
+                    <Image src={formCertThumbnail} alt="Certification thumbnail preview" fill className="object-cover" sizes="32px" />
+                  </a>
+                ) : (
+                  <p className="text-xs text-text-muted">No thumbnail attached</p>
+                )}
+              </div>
+
+              <div className="mb-3">
+                <p className="text-xs uppercase tracking-wider text-text-muted mb-2">Palette</p>
+                <span
+                  className="admin-meta-chip"
+                  style={{ backgroundColor: formPalette.bgTint, color: formPalette.textColor }}
+                >
+                  <span className="inline-block h-2 w-2 rounded-full" style={{ backgroundColor: formPalette.textColor }} />
+                  {formPaletteCode}
+                </span>
+              </div>
+
+              <div className="mb-3">
+                <p className="text-xs uppercase tracking-wider text-text-muted mb-2">Credential Link</p>
+                {formCredentialLink ? (
+                  <a
+                    href={formCredentialLink}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="admin-preview-row w-fit"
+                  >
+                    <FaExternalLinkAlt size={10} />
+                    Open credential link
+                  </a>
+                ) : (
+                  <p className="text-xs text-text-muted">No credential link</p>
+                )}
+              </div>
+
+              <div>
+                <p className="text-xs uppercase tracking-wider text-text-muted mb-2">Files</p>
+                {formCertFiles.length > 0 ? (
+                  <div className="space-y-1">
+                    {formCertFiles.map((attachment) => (
+                      <a
+                        key={attachment.id}
+                        href={attachment.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="admin-preview-row w-fit"
+                      >
+                        <FaPaperclip size={10} />
+                        {attachment.label || attachment.url}
+                      </a>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-xs text-text-muted">No files attached</p>
+                )}
               </div>
             </div>
 

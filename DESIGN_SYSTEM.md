@@ -223,6 +223,12 @@ Supported icon source values:
 - fixed media ratio (`aspect-[4/3]`)
 - single-line category clamp
 - two-line title clamp
+- Desktop rail cards use fixed card frames for uniform scrolling rhythm:
+- fixed rail basis/width per breakpoint (`340/360/380`)
+- fixed rail card height (`420/440`)
+- fixed meta block height so long/short content does not change card height
+- Recent Works includes a confidentiality caveat directly below the heading:
+- “Most Power Apps and Dynamics 365 projects are confidential enterprise engagements, so only a limited selection can be shown.”
 - Full image viewing is modal-first:
 - cards do not expand inline to show full images
 - modal image list uses `thumbnail + gallery[]` (trimmed, deduped, non-empty)
@@ -282,6 +288,11 @@ Anchors: `#about`, `#services`, `#portfolio`, `#certifications`, `#contact`.
 - Table/list rows use subtle hover feedback.
 - Projects and certifications ordering use drag-and-drop rows with explicit `Save Order` actions.
 - Project media management is gallery-first with multi-upload and thumbnail selection from uploaded gallery images.
+- Admin rows and modals include compact media/link preview affordances:
+  - Projects: mini thumbnail + `🖼/📄/🔗` chips + quick open links.
+  - Certifications: mini thumbnail + provider palette swatch/code + `🖼/📄/🔗` chips + quick open links.
+  - Preview actions always open in a new tab (`target="_blank"` + `rel="noopener noreferrer"`).
+  - `attachments` preview is conditional and shown only when data exists.
 - Media lifecycle policy: when image references are removed in admin data, unreferenced files are automatically cleaned from `public/images` (default placeholders are protected).
 
 ---

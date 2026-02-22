@@ -163,6 +163,12 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
           </button>
         </div>
 
+        <div className="mb-6 max-w-3xl rounded-lg border border-border-subtle/70 bg-bg-card/40 px-4 py-3">
+          <p className="text-sm text-text-muted leading-relaxed">
+            Most Power Apps and Dynamics 365 projects are confidential enterprise engagements, so only a limited selection can be shown.
+          </p>
+        </div>
+
         <div className="flex flex-wrap gap-2 sm:gap-3 mb-8 md:mb-10">
           {categories.map((category) => (
             <button
@@ -185,6 +191,7 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
               <ProjectCard
                 key={`grid-${project.id}`}
                 project={project}
+                mode="grid"
                 onClick={() => setSelectedProject(project)}
               />
             ))}
@@ -199,6 +206,7 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
                 >
                   <ProjectCard
                     project={project}
+                    mode="grid"
                     onClick={() => setSelectedProject(project)}
                   />
                 </div>
@@ -216,10 +224,11 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
                     <div
                       key={`desktop-${project.id}`}
                       data-project-card="true"
-                      className="min-w-[340px] xl:min-w-[360px] 2xl:min-w-[380px] h-full"
+                      className="min-w-[340px] xl:min-w-[360px] 2xl:min-w-[380px] basis-[340px] xl:basis-[360px] 2xl:basis-[380px] shrink-0 h-[420px] xl:h-[440px]"
                     >
                       <ProjectCard
                         project={project}
+                        mode="rail"
                         onClick={() => setSelectedProject(project)}
                       />
                     </div>
@@ -264,21 +273,34 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
   );
 }
 
-function ProjectCard({ project, onClick }: { project: Project; onClick: () => void }) {
+function ProjectCard({
+  project,
+  onClick,
+  mode = "grid",
+}: {
+  project: Project;
+  onClick: () => void;
+  mode?: "rail" | "grid";
+}) {
   const { ref, isVisible } = useScrollReveal(0.1);
   const safeThumbnail = project.thumbnail?.trim() || DEFAULT_PROJECT_THUMBNAIL;
   const projectCategories = getProjectCategories(project);
   const categoryLabel = projectCategories.join(" • ");
+  const isRail = mode === "rail";
 
   return (
     <div
       ref={ref}
-      className={`cursor-pointer group h-full flex flex-col transition-all duration-700 ${
+      className={`cursor-pointer group h-full flex flex-col transition-all duration-700 ${isRail ? "project-card-rail" : ""} ${
         isVisible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"
       }`}
       onClick={onClick}
     >
-      <div className="media-atmosphere relative aspect-[4/3] rounded-xl overflow-hidden bg-bg-card mb-4">
+      <div
+        className={`media-atmosphere relative aspect-[4/3] rounded-xl overflow-hidden bg-bg-card mb-4 ${
+          isRail ? "project-card-rail__media" : ""
+        }`}
+      >
         <div className="media-atmosphere__bg transition-transform duration-500 group-hover:scale-105">
           <Image
             src={safeThumbnail}
@@ -301,12 +323,14 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
       </div>
-      <p className="project-card-category text-xs text-text-muted uppercase tracking-wider mb-1">
-        {categoryLabel || "Uncategorized"}
-      </p>
-      <h3 className="project-card-title text-base md:text-lg font-semibold text-text-primary group-hover:text-accent-purple transition-colors min-h-[3.2rem] md:min-h-[3.4rem]">
-        {project.title}
-      </h3>
+      <div className={isRail ? "project-card-rail__meta mt-auto" : ""}>
+        <p className="project-card-category text-xs text-text-muted uppercase tracking-wider mb-1">
+          {categoryLabel || "Uncategorized"}
+        </p>
+        <h3 className="project-card-title text-base md:text-lg font-semibold text-text-primary group-hover:text-accent-purple transition-colors min-h-[3.2rem] md:min-h-[3.4rem]">
+          {project.title}
+        </h3>
+      </div>
     </div>
   );
 }

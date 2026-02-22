@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter, Dancing_Script, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import PostHogProvider from "@/components/analytics/PostHogProvider";
+import { Analytics } from "@vercel/analytics/next";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -45,6 +46,7 @@ export default function RootLayout({
         className={`${inter.variable} ${dancingScript.variable} ${jetbrainsMono.variable} antialiased`}
       >
         <PostHogProvider>{children}</PostHogProvider>
+        <Analytics />
       </body>
     </html>
   );

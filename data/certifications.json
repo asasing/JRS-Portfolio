@@ -13,14 +13,30 @@
     "paletteCode": "provider-cyan"
   },
   {
+    "id": "cert-005",
+    "name": "Azure AI Engineer Associate",
+    "year": "2024",
+    "organization": "Microsoft",
+    "description": "Covers designing and implementing AI solutions using Azure Cognitive Services, Language Studio, and Azure Machine Learning.",
+    "credentialUrl": "",
+    "badgeColor": "#f59e0b",
+    "order": 2,
+    "credentialId": "",
+    "thumbnail": "/images/certifications/3e6555dd-1771699810639.png",
+    "paletteCode": "provider-cyan"
+  },
+  {
     "id": "cert-002",
     "name": "Azure Developer Associate",
     "year": "2024",
     "organization": "Microsoft",
     "description": "Validates skills in designing, building, testing, and maintaining cloud applications and services on Microsoft Azure.",
-    "credentialUrl": "#",
+    "credentialUrl": "",
     "badgeColor": "#06b6d4",
-    "order": 2
+    "order": 3,
+    "credentialId": "",
+    "thumbnail": "/images/certifications/335169be-1771699608893.png",
+    "paletteCode": "provider-cyan"
   },
   {
     "id": "cert-003",
@@ -28,9 +44,12 @@
     "year": "2023",
     "organization": "Microsoft",
     "description": "Validates skills in designing and developing Power Platform solutions including custom components, plugins, and integrations.",
-    "credentialUrl": "#",
+    "credentialUrl": "",
     "badgeColor": "#d946ef",
-    "order": 3
+    "order": 4,
+    "credentialId": "",
+    "thumbnail": "/images/certifications/8e5fdd7f-1771699718396.png",
+    "paletteCode": "provider-cyan"
   },
   {
     "id": "cert-004",
@@ -38,19 +57,12 @@
     "year": "2023",
     "organization": "Microsoft",
     "description": "Certification for configuring and extending Power Apps, Power Automate, and Dataverse for business solutions.",
-    "credentialUrl": "#",
+    "credentialUrl": "https://learn.microsoft.com/en-us/users/JohnRoldanSasing-6322/credentials/9FEA62D982832C8A?ref=https%3A%2F%2Fwww.linkedin.com%2F",
     "badgeColor": "#10b981",
-    "order": 4
-  },
-  {
-    "id": "cert-005",
-    "name": "Azure AI Engineer Associate",
-    "year": "2024",
-    "organization": "Microsoft",
-    "description": "Covers designing and implementing AI solutions using Azure Cognitive Services, Language Studio, and Azure Machine Learning.",
-    "credentialUrl": "#",
-    "badgeColor": "#f59e0b",
-    "order": 5
+    "order": 5,
+    "credentialId": "9FEA62D982832C8A",
+    "thumbnail": "/images/certifications/5e080e1c-1771699789646.png",
+    "paletteCode": "provider-cyan"
   },
   {
     "id": "cert-006",
@@ -58,9 +70,12 @@
     "year": "2020",
     "organization": "Automation Anywhere",
     "description": "Advanced RPA certification for building, deploying, and managing enterprise-grade bot automation workflows.",
-    "credentialUrl": "#",
+    "credentialUrl": "",
     "badgeColor": "#ef4444",
-    "order": 6
+    "order": 6,
+    "credentialId": "AAADVC-19818026",
+    "thumbnail": "/images/certifications/ead57898-1771738625749.png",
+    "paletteCode": "provider-orange"
   },
   {
     "id": "cert-d44c49a1",
@@ -76,21 +91,27 @@
     "id": "cert-614c3805",
     "name": "Certified Kanban Associate",
     "year": "2020",
-    "organization": "International Scrum Institute\u2122 (Scrum Institute)",
+    "organization": "International Scrum Institute™ (Scrum Institute)",
     "description": "Fundamentals of Kanban. It is designed for agile practitioners and project managers looking to validate their Kanban knowledge",
     "credentialUrl": "",
     "badgeColor": "#f45ff7",
-    "order": 8
+    "order": 8,
+    "credentialId": "",
+    "thumbnail": "/images/certifications/34990731-1771739333912.png",
+    "paletteCode": "provider-amber"
   },
   {
     "id": "cert-fc20cebc",
     "name": "Scrum Associate Accredited Certification",
     "year": "2020",
-    "organization": "International Scrum Institute\u2122 (Scrum Institute)",
-    "description": "The Scrum Associate Accredited Certification from the International Scrum Institute\u2122 (ISI) is an online, entry-level certification designed to validate foundational knowledge of Agile Scrum principles.",
+    "organization": "International Scrum Institute™ (Scrum Institute)",
+    "description": "The Scrum Associate Accredited Certification from the International Scrum Institute™ (ISI) is an online, entry-level certification designed to validate foundational knowledge of Agile Scrum principles.",
     "credentialUrl": "",
     "badgeColor": "#5fd8f7",
-    "order": 9
+    "order": 9,
+    "credentialId": "84464710072148",
+    "thumbnail": "/images/certifications/a24b2b19-1771739299557.png",
+    "paletteCode": "provider-amber"
   },
   {
     "id": "cert-3f1df0fc",
@@ -100,6 +121,9 @@
     "description": "Covers basic Agile principles, roles, events, and artifacts, making it ideal for beginners, team members, or managers starting their Agile journey.",
     "credentialUrl": "",
     "badgeColor": "#f78d5f",
-    "order": 10
+    "order": 10,
+    "credentialId": "42230868",
+    "thumbnail": "/images/certifications/e5875b75-1771739312761.jpg",
+    "paletteCode": "provider-green"
   }
 ]

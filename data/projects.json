@@ -1,17 +1,23 @@
 [
   {
     "id": "proj-35de46d7",
-    "title": "SME Technology Services Company \u2013 Power Platform Enhancements",
+    "title": "SME Technology Services Company – Power Platform Enhancements",
     "category": "Power Platform & Dynamics 365",
     "categories": [
       "Power Platform & Dynamics 365"
     ],
     "description": "<p>Power Apps | Power Automate | Business Process Automation <br><br>Delivered application enhancements and workflow optimizations within an existing Power Platform solution for a technology-focused SME. Responsibilities included: Implementing new feature requirements Fixing functional defects and logic issues Enhancing UI/UX components for improved usability Optimizing Power Automate flows to reduce manual effort Ensuring stability and alignment with business process needs The improvements increased operational efficiency and improved system reliability for internal users.</p>",
-    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnail": "/images/projects/2fc094b9-1771698624676.png",
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [],
+    "gallery": [
+      "/images/projects/79032dc5-1771698624621.png",
+      "/images/projects/bf427a78-1771698624651.png",
+      "/images/projects/2fc094b9-1771698624676.png",
+      "/images/projects/194c5a3b-1771698624698.png",
+      "/images/projects/b792e4ff-1771698624721.png"
+    ],
     "links": [],
     "order": 1
   },
@@ -25,13 +31,39 @@
       "Custom App Development"
     ],
     "description": "<p>Designed and developed a modern e-commerce platform and internal admin dashboard for a multi-branch shoes and apparel brand. The solution streamlines online sales, inventory management, order processing, and business analytics into a centralized system</p>",
-    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnail": "/images/projects/433a0296-1771699174867.png",
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [],
+    "gallery": [
+      "/images/projects/433a0296-1771699174867.png",
+      "/images/projects/3aaaaf7c-1771699174897.png",
+      "/images/projects/bd087123-1771699174921.png",
+      "/images/projects/566174ff-1771699174946.png"
+    ],
     "links": [],
     "order": 2
+  },
+  {
+    "id": "proj-003",
+    "title": "Account Management & Employment System for Not-for-Profit Org",
+    "category": "Custom App Development",
+    "categories": [
+      "Custom App Development"
+    ],
+    "description": "<p><strong>Sector:</strong> Workforce / Employer Engagement / Enterprise Operations<br><strong>Role:</strong> Senior Engineer &amp; Solution Architect<br><br>Led the design and implementation of a centralized Account Management and Employment tracking system to replace fragmented records and manual processes.</p><p>The solution provides structured tracking of organizations, employer engagement activities, participants, and employment outcomes — creating a single source of truth for operational reporting and governance.<br><br>Designed the full data model (core tables, relationships, normalized structure)</p><p>Defined governance strategy (ownership, security roles, DLP considerations)</p><ul><li><p>Ensured scalability for future integrations and reporting expansion<br><br><br>Impact</p><ul><li><p>Replaced manual spreadsheets with centralized system</p></li><li><p>Improved visibility of employer engagement lifecycle</p></li><li><p>Increased accountability via structured audit trails</p></li><li><p>Reduced operational friction and follow-up gaps</p></li></ul></li></ul><p></p>",
+    "thumbnail": "/images/projects/1e0decb9-1771699190695.png",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [
+      "/images/projects/ba88dfa4-1771699190596.png",
+      "/images/projects/0b92a6d8-1771699190634.png",
+      "/images/projects/803503ac-1771699190658.png",
+      "/images/projects/1e0decb9-1771699190695.png"
+    ],
+    "links": [],
+    "order": 3
   },
   {
     "id": "proj-002",
@@ -43,13 +75,17 @@
       "Power Platform & Dynamics 365"
     ],
     "description": "Built a migration pipeline using Azure Data Factory and SQL scripts to sync 50K+ records, ensuring 99.9% data accuracy and reducing migration effort by 60%.",
-    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnail": "/images/projects/5f12997a-1771699216937.png",
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [],
+    "gallery": [
+      "/images/projects/e8044067-1771699216880.png",
+      "/images/projects/15a9d00a-1771699216911.png",
+      "/images/projects/5f12997a-1771699216937.png"
+    ],
     "links": [],
-    "order": 3
+    "order": 4
   },
   {
     "id": "proj-005",
@@ -61,29 +97,13 @@
       "API Integration"
     ],
     "description": "<p>Built an n8n workflow integrating OpenAI GPT and image generation, and caption, for automated branded social media content creation. Reduced manual creative work by 70% and ensured consistent brand voice across platforms.</p>",
-    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnail": "/images/projects/59e0a479-1771699249139.png",
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [],
-    "links": [],
-    "order": 4
-  },
-  {
-    "id": "proj-004",
-    "title": "Project Engineers Checklist Automation",
-    "category": "Power Platform & Dynamics 365",
-    "categories": [
-      "Power Platform & Dynamics 365",
-      "API Integration",
-      "Automation"
+    "gallery": [
+      "/images/projects/59e0a479-1771699249139.png"
     ],
-    "description": "Designed and deployed a Canvas App with integrated Power Automate flows, reducing manual checklist processing time by 70% for an energy sector client.",
-    "thumbnail": "/images/projects/placeholder-1.svg",
-    "thumbnailFocusX": 50,
-    "thumbnailFocusY": 50,
-    "thumbnailZoom": 1,
-    "gallery": [],
     "links": [],
     "order": 5
   },
@@ -98,62 +118,35 @@
       "API Integration"
     ],
     "description": "Designed and developed a Power Pages portal integrated with an LLM-based chatbot via custom APIs for a startup's pre-sales demo. Enabled intelligent Q&A and lead engagement automation, contributing to the client's successful product pitch and stakeholder buy-in.",
-    "thumbnail": "/images/projects/d3019bfc-1771693038766.png",
-    "thumbnailFocusX": 47.14284987676711,
-    "thumbnailFocusY": 53.386269221230165,
+    "thumbnail": "/images/projects/c29ebe1f-1771699438932.png",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [],
+    "gallery": [
+      "/images/projects/c29ebe1f-1771699438932.png"
+    ],
     "links": [],
     "order": 6
   },
   {
-    "id": "proj-006",
-    "title": "Automated Invoice Generator",
-    "category": "Automation",
+    "id": "proj-004",
+    "title": "Project Engineers Checklist Automation",
+    "category": "Power Platform & Dynamics 365",
     "categories": [
-      "Automation",
-      "API Integration"
-    ],
-    "description": "Built an n8n + Google Apps Script pipeline to process OCR-based timesheets, auto-generate invoices, and email them to finance. Cut processing time from ~2 hours/week to under 10 minutes.",
-    "thumbnail": "/images/projects/placeholder-1.svg",
-    "thumbnailFocusX": 50,
-    "thumbnailFocusY": 50,
-    "thumbnailZoom": 1,
-    "gallery": [],
-    "links": [],
-    "order": 7
-  },
-  {
-    "id": "proj-007",
-    "title": "POS to Excel Sales & Expense Tracker",
-    "category": "Automation",
-    "categories": [
+      "Power Platform & Dynamics 365",
+      "API Integration",
       "Automation"
     ],
-    "description": "Created Google Apps Script automations integrating an open-source POS system with Google Sheets, syncing daily sales, expenses, and payment types. Achieved 100% reduction in manual encoding for small retail businesses.",
-    "thumbnail": "/images/projects/placeholder-1.svg",
+    "description": "Designed and deployed a Canvas App with integrated Power Automate flows, reducing manual checklist processing time by 70% for an energy sector client.",
+    "thumbnail": "/images/projects/82feda4a-1771699412980.png",
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [],
-    "links": [],
-    "order": 8
-  },
-  {
-    "id": "proj-003",
-    "title": "Account Management & Employment System for Not-for-Profit Org",
-    "category": "Custom App Development",
-    "categories": [
-      "Custom App Development"
+    "gallery": [
+      "/images/projects/82feda4a-1771699412980.png"
     ],
-    "description": "<p><strong>Sector:</strong> Workforce / Employer Engagement / Enterprise Operations<br><strong>Role:</strong> Senior Engineer &amp; Solution Architect<br><br>Led the design and implementation of a centralized Account Management and Employment tracking system to replace fragmented records and manual processes.</p><p>The solution provides structured tracking of organizations, employer engagement activities, participants, and employment outcomes \u2014 creating a single source of truth for operational reporting and governance.<br><br>Designed the full data model (core tables, relationships, normalized structure)</p><p>Defined governance strategy (ownership, security roles, DLP considerations)</p><ul><li><p>Ensured scalability for future integrations and reporting expansion<br><br><br>Impact</p><ul><li><p>Replaced manual spreadsheets with centralized system</p></li><li><p>Improved visibility of employer engagement lifecycle</p></li><li><p>Increased accountability via structured audit trails</p></li><li><p>Reduced operational friction and follow-up gaps</p></li></ul></li></ul><p></p>",
-    "thumbnail": "/images/projects/placeholder-1.svg",
-    "thumbnailFocusX": 50,
-    "thumbnailFocusY": 50,
-    "thumbnailZoom": 1,
-    "gallery": [],
     "links": [],
-    "order": 2
+    "order": 7
   },
   {
     "id": "proj-17e6ea02",
@@ -166,11 +159,53 @@
       "Automation"
     ],
     "description": "<p>Designed and built a centralized admin application initially focused on expense tracking, sales tracking, staff management, which evolved into a broader AI-enabled retail management for insights and reporting.</p>",
-    "thumbnail": "/images/projects/placeholder-1.svg",
+    "thumbnail": "/images/projects/b345f150-1771699551348.png",
     "thumbnailFocusX": 50,
     "thumbnailFocusY": 50,
     "thumbnailZoom": 1,
-    "gallery": [],
+    "gallery": [
+      "/images/projects/b345f150-1771699551348.png"
+    ],
+    "links": [],
+    "order": 8
+  },
+  {
+    "id": "proj-006",
+    "title": "Automated Invoice Generator",
+    "category": "Automation",
+    "categories": [
+      "Automation",
+      "API Integration"
+    ],
+    "description": "<p>Built an n8n + Google Apps Script pipeline to process, auto-generate invoices, and email them to respective recepients. Cut processing time from ~2 hours/week to under 10 minutes.</p>",
+    "thumbnail": "/images/projects/26033ce5-1771699512380.png",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [
+      "/images/projects/26033ce5-1771699512380.png",
+      "/images/projects/5318a5e4-1771699512405.png"
+    ],
+    "links": [],
+    "order": 9
+  },
+  {
+    "id": "proj-007",
+    "title": "POS to Excel Sales & Expense Tracker",
+    "category": "Automation",
+    "categories": [
+      "Automation"
+    ],
+    "description": "Created Google Apps Script automations integrating an open-source POS system with Google Sheets, syncing daily sales, expenses, and payment types. Achieved 100% reduction in manual encoding for small retail businesses.",
+    "thumbnail": "/images/projects/1aef7e42-1771699528811.png",
+    "thumbnailFocusX": 50,
+    "thumbnailFocusY": 50,
+    "thumbnailZoom": 1,
+    "gallery": [
+      "/images/projects/1aef7e42-1771699528811.png",
+      "/images/projects/d4796007-1771699528843.png",
+      "/images/projects/8b5ffb58-1771699528875.png"
+    ],
     "links": [],
     "order": 10
   }

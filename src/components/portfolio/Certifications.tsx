@@ -62,14 +62,25 @@ function CertCard({ cert }: { cert: Certification }) {
             event.stopPropagation();
             setShowImagePreview(true);
           }}
-          className="mb-4 relative h-44 w-full overflow-hidden rounded-xl border border-border-subtle bg-bg-primary cursor-zoom-in"
+          className="media-atmosphere mb-4 relative h-44 w-full overflow-hidden rounded-xl border border-border-subtle bg-bg-primary cursor-zoom-in"
           aria-label={`Preview certification image for ${cert.name}`}
         >
+          <div className="media-atmosphere__bg">
+            <Image
+              src={thumbnail}
+              alt=""
+              aria-hidden="true"
+              fill
+              className="object-cover"
+              sizes="(max-width: 768px) 100vw, 33vw"
+            />
+          </div>
+          <div className="media-atmosphere__vignette" />
           <Image
             src={thumbnail}
             alt={`${cert.name} thumbnail`}
             fill
-            className="object-contain transition-transform duration-500 hover:scale-105"
+            className="media-atmosphere__fg object-contain transition-transform duration-500 hover:scale-105"
             sizes="(max-width: 768px) 100vw, 33vw"
           />
         </button>

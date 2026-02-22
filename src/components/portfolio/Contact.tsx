@@ -104,7 +104,12 @@ export default function Contact({ profile }: ContactProps) {
           />
           <div className="mb-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
             <div className="text-sm">
-              {status === "sent" && <span className="text-year-green">Message sent successfully!</span>}
+              {status === "sent" && (
+                <span className="text-year-green flex flex-col leading-snug gap-0.5">
+                  <span>Thank you for reaching out.</span>
+                  <span>We&apos;ll get back to you as soon as possible.</span>
+                </span>
+              )}
               {status === "error" && <span className="text-accent-pink">{errorMessage}</span>}
             </div>
             <Button type="submit" size="md" className="px-10 py-4" disabled={status === "sending"}>

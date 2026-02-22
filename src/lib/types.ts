@@ -14,6 +14,15 @@ export interface Profile {
   phone: string;
 }
 
+export interface Attachment {
+  id: string;
+  label: string;
+  url: string;
+  mimeType:
+    | "application/pdf"
+    | "application/vnd.openxmlformats-officedocument.wordprocessingml.document";
+}
+
 export interface Project {
   id: string;
   title: string;
@@ -25,6 +34,7 @@ export interface Project {
   thumbnailFocusY?: number;
   thumbnailZoom?: number;
   gallery: string[];
+  attachments?: Attachment[];
   links: { label: string; url: string }[];
   order: number;
 }
@@ -44,6 +54,7 @@ export interface Certification {
   credentialUrl?: string;
   credentialId?: string;
   thumbnail?: string;
+  attachments?: Attachment[];
   paletteCode?: string;
   badgeColor: string;
   order: number;

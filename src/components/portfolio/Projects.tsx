@@ -6,7 +6,7 @@ import { Project, ProjectCategory } from "@/lib/types";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 import SectionHeading from "./SectionHeading";
 import ProjectDetail from "./ProjectDetail";
-import { FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaChevronLeft, FaChevronRight, FaExpand, FaCompress } from "react-icons/fa";
 import { DEFAULT_PROJECT_THUMBNAIL } from "@/lib/constants";
 
 interface ProjectsProps {
@@ -154,8 +154,12 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
             type="button"
             onClick={() => setViewMode((prev) => (prev === "rail" ? "grid" : "rail"))}
             className="pill-button border border-border-subtle text-xs sm:text-sm text-text-secondary hover:text-text-primary hover:border-accent-purple/50 transition-colors cursor-pointer self-start md:self-auto"
+            aria-label={viewMode === "rail" ? "Switch to grid view" : "Switch to rail view"}
           >
-            {viewMode === "rail" ? "Expand" : "Shrink"}
+            <span className="inline-flex items-center gap-2">
+              {viewMode === "rail" ? <FaExpand size={12} /> : <FaCompress size={12} />}
+              {viewMode === "rail" ? "Grid View" : "Rail View"}
+            </span>
           </button>
         </div>
 
@@ -204,7 +208,7 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
             <div className="relative hidden lg:block">
               <div
                 ref={desktopRailRef}
-                className="overflow-x-auto scroll-smooth pb-2"
+                className="hide-scrollbar overflow-x-auto scroll-smooth pb-2"
                 onWheel={handleRailWheel}
               >
                 <div className="flex gap-6 w-max pr-2">
@@ -274,8 +278,19 @@ function ProjectCard({ project, onClick }: { project: Project; onClick: () => vo
       }`}
       onClick={onClick}
     >
-      <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-bg-card mb-4">
-        <div className="absolute inset-0 transition-transform duration-500 group-hover:scale-105">
+      <div className="media-atmosphere relative aspect-[4/3] rounded-xl overflow-hidden bg-bg-card mb-4">
+        <div className="media-atmosphere__bg transition-transform duration-500 group-hover:scale-105">
+          <Image
+            src={safeThumbnail}
+            alt=""
+            aria-hidden="true"
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+          />
+        </div>
+        <div className="media-atmosphere__vignette" />
+        <div className="media-atmosphere__fg transition-transform duration-500 group-hover:scale-105">
           <Image
             src={safeThumbnail}
             alt={project.title}

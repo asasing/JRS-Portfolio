@@ -27,3 +27,9 @@
 7. Verification
 - Run `npm run build`.
 - Run `npm run lint`; note baseline issues separately.
+
+8. Analytics
+- Confirm PostHog is NOT firing events on `/admin/*` routes.
+- Confirm custom events appear in PostHog Live Events dashboard after interactions.
+- If new interactive components are added: wire `capture()` calls using `src/lib/analytics.ts`.
+- If new public env vars are added: document in `CLAUDE.md`, `DESIGN_SYSTEM.md`, and `README.md`.

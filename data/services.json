@@ -11,7 +11,7 @@
     "id": "svc-002",
     "number": "02/",
     "title": "AI & Intelligent Automation",
-    "description": "Implementing AI-driven automation using Azure AI Services, OpenAI/LLM integrations, Anthropic, Microsoft Copilot Studio, and RPA.\n\nI help organizations reduce repetitive work, unlock data insights, and embed intelligent decision support directly into their operations.",
+    "description": "Implementing AI-driven automation using Azure AI Services, OpenAI/LLM integrations, Anthropic, Microsoft Copilot Studio, and RPA.\n\nI help organizations reduce repetitive work, unlock data insights, and embed intelligent decision support directly into their operations.\n\n• AI-assisted document processing\n• AI-powered knowledge assistants\n• Smart ticket classification\n• LLM-driven business intelligence",
     "icon": "/images/services/724ad9ec-1771521662280.png",
     "order": 2
   },
@@ -36,7 +36,7 @@
     "number": "05/",
     "title": "Automation & Integration Consulting",
     "description": "Connecting systems and eliminating operational silos through API integrations, workflow automation, and data migration strategies.\n\nI specialize in integrating legacy systems, third-party services, Microsoft ecosystem tools, and custom platforms into a unified digital backbone.",
-    "icon": "FaCode",
+    "icon": "/images/services/b3da5856-1771762763808.png",
     "order": 5
   }
 ]

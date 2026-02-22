@@ -22,3 +22,11 @@
 - Upload API: `/api/upload`
 - Public path pattern: `/images/<category>/<file>`
 - Keep render-time fallback guards for missing/blank image paths.
+
+## Analytics Layer
+- Provider: PostHog (`posthog-js`)
+- Init: `src/components/analytics/PostHogProvider.tsx` — client component in root layout, excluded on `/admin/*`
+- Capture helper: `src/lib/analytics.ts` → `capture(event, props?)` — server-safe, silent on failure
+- Section tracking: `src/components/analytics/SectionTracker.tsx` — IntersectionObserver, renders null
+- Custom events wired in: `Projects.tsx`, `ProjectDetail.tsx`, `Contact.tsx`
+- Env: `NEXT_PUBLIC_POSTHOG_KEY`, `NEXT_PUBLIC_POSTHOG_HOST`

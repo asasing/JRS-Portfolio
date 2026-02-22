@@ -28,6 +28,8 @@ Set these in `.env`:
 - `SMTP_USER`
 - `SMTP_PASS`
 - `CONTACT_DRY_RUN` (optional)
+- `NEXT_PUBLIC_POSTHOG_KEY` (PostHog project API key)
+- `NEXT_PUBLIC_POSTHOG_HOST` (PostHog ingestion host, default `https://us.i.posthog.com`)
 
 Contact semantics:
 - Real SMTP send is the default expectation.
@@ -50,6 +52,7 @@ Admin pages and related APIs:
 - Reorder APIs: `/api/projects/reorder`, `/api/certifications/reorder`
 - Uploads via `/api/upload`
 - Contact form via `/api/contact`
+- Analytics: PostHog via `src/components/analytics/PostHogProvider.tsx`; excluded from `/admin/*`
 
 ## Where To Update What
 - Visual rules and spacing/tokens: `DESIGN_SYSTEM.md`

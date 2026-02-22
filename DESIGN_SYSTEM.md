@@ -308,11 +308,46 @@ Anchors: `#about`, `#services`, `#portfolio`, `#certifications`, `#contact`.
 
 ---
 
+## Analytics
+
+- Provider: PostHog (`posthog-js`)
+- Initialized in: `src/components/analytics/PostHogProvider.tsx` (wrapped in root layout)
+- Admin exclusion: PostHog is NOT initialized on `/admin/*` routes
+- Event capture helper: `src/lib/analytics.ts` → `capture(event, props?)`
+
+### Automatic (PostHog built-in)
+- `$pageview` — every page load
+- `$pageleave` — session duration / exit page
+- `$autocapture` — all clicks, form inputs, external links
+- Session recordings, heatmaps, and user geo data available in PostHog dashboard
+
+### Custom Events
+| Event | Trigger | Properties |
+|---|---|---|
+| `section_viewed` | Section enters viewport (30% threshold, first time) | `section` |
+| `section_left` | Section exits viewport | `section`, `dwell_seconds` |
+| `project_card_clicked` | Project card click (grid, mobile, rail) | `project_id`, `project_title`, `categories` |
+| `project_category_filtered` | Filter chip clicked | `category` |
+| `project_view_mode_toggled` | Rail ↔ Grid toggle | `mode` |
+| `project_link_clicked` | External project link in modal | `project_id`, `project_title`, `link_label` |
+| `contact_form_started` | First keystroke in any contact field | — |
+| `contact_form_submitted` | Form submit pressed | — |
+| `contact_form_success` | Server returned 200 | — |
+| `contact_form_error` | Server/network error | `error_message` |
+
+### Environment Variables
+- `NEXT_PUBLIC_POSTHOG_KEY` — PostHog project API key
+- `NEXT_PUBLIC_POSTHOG_HOST` — PostHog ingestion host (default: `https://us.i.posthog.com`)
+
+---
+
 ## File References
 
 - Design tokens and utilities: `src/app/globals.css`
 - Font loading: `src/app/layout.tsx`
 - Portfolio components: `src/components/portfolio/*`
+- Analytics components: `src/components/analytics/*`
+- Analytics capture helper: `src/lib/analytics.ts`
 - Data models: `src/lib/types.ts`
 - Content data: `data/*.json`
 

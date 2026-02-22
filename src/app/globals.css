@@ -142,7 +142,6 @@ body {
 }
 
 .hero-code-title {
-  margin-bottom: clamp(2.2rem, 4vw, 3.5rem);
   display: flex;
   justify-content: center;
 }

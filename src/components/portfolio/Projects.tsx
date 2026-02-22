@@ -173,8 +173,8 @@ export default function Projects({ projects, projectCategories }: ProjectsProps)
         </div>
 
         <div className="mb-6 max-w-3xl rounded-lg border border-border-subtle/70 bg-bg-card/40 px-4 py-3">
-          <p className="text-sm text-text-muted leading-relaxed">
-            Most Power Apps and Dynamics 365 projects are confidential enterprise engagements, so only a limited selection can be shown.
+          <p className="italic text-sm text-text-muted leading-relaxed">
+            Note: Most Power Apps and Dynamics 365 projects are confidential enterprise engagements, so only a limited selection can be shown.
           </p>
         </div>
 

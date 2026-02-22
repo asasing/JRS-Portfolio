@@ -62,6 +62,9 @@ It documents architecture, data flow, key decisions, and recent changes implemen
   - `SMTP_SECURE`
   - `SMTP_USER`
   - `SMTP_PASS`
+- Analytics vars:
+  - `NEXT_PUBLIC_POSTHOG_KEY` (PostHog project API key)
+  - `NEXT_PUBLIC_POSTHOG_HOST` (PostHog ingestion host, default `https://us.i.posthog.com`)
 
 ## Major UX/Feature Decisions Implemented
 1. Admin image upload-first UX
@@ -138,7 +141,21 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Rail cards keep fixed category/title meta area height so content length does not affect card height.
 - Added confidentiality caveat under the Recent Works heading explaining that most Power Apps and Dynamics 365 work is enterprise-confidential and only limited samples are shown.
 
+13. PostHog analytics
+- `posthog-js` installed; initialized via `PostHogProvider` in root layout (`src/app/layout.tsx`).
+- Admin routes (`/admin/*`) are excluded from tracking entirely.
+- `src/lib/analytics.ts` exposes a safe `capture()` wrapper (no-ops on server or if PostHog is uninitialized).
+- `SectionTracker` fires `section_viewed` (once per section per page load) and `section_left` (with `dwell_seconds`) via IntersectionObserver with 30% threshold.
+- Custom events: `project_card_clicked`, `project_category_filtered`, `project_view_mode_toggled`, `project_link_clicked`, `contact_form_started/submitted/success/error`.
+- PostHog autocapture handles all other clicks, inputs, and external links automatically.
+- Session recordings, heatmaps, and geo data available in PostHog dashboard without additional code.
+
 ## Important Files Touched Recently
+- `src/lib/analytics.ts`
+- `src/components/analytics/PostHogProvider.tsx`
+- `src/components/analytics/SectionTracker.tsx`
+- `src/components/portfolio/PortfolioClient.tsx`
+- `src/app/layout.tsx`
 - `src/app/globals.css`
 - `src/components/portfolio/Services.tsx`
 - `src/components/portfolio/Contact.tsx`
@@ -268,6 +285,16 @@ It documents architecture, data flow, key decisions, and recent changes implemen
 - Updated admin projects modal with per-link open action and consolidated Preview panel (images/files/links).
 - Updated admin certifications row UI with mini thumbnail, provider palette swatch + code, media/link chips, and quick-open actions.
 - Updated admin certifications modal with live Preview panel (thumbnail, palette, credential link, files).
+
+### 2026-02-22 (PostHog Analytics Integration)
+- Installed `posthog-js` package.
+- Added `src/lib/analytics.ts`: safe PostHog `capture()` wrapper (server-safe, silent on uninitialized).
+- Added `src/components/analytics/PostHogProvider.tsx`: initializes PostHog in root layout; skips entirely on `/admin/*` routes; guards with `posthog.__loaded` to prevent double-init.
+- Added `src/components/analytics/SectionTracker.tsx`: IntersectionObserver fires `section_viewed` (once per section) and `section_left` (with `dwell_seconds`) for all 5 portfolio sections.
+- Updated `src/components/portfolio/Projects.tsx`: fires `project_card_clicked`, `project_category_filtered`, `project_view_mode_toggled` on all card variants (grid/mobile/rail).
+- Updated `src/components/portfolio/ProjectDetail.tsx`: fires `project_link_clicked` on external project links.
+- Updated `src/components/portfolio/Contact.tsx`: fires `contact_form_started` on first field interaction, `contact_form_submitted`, `contact_form_success`, `contact_form_error`.
+- Added `NEXT_PUBLIC_POSTHOG_KEY` and `NEXT_PUBLIC_POSTHOG_HOST` to `.env`.
 
 ### 2026-02-22 (Recent Works Rail Uniformity)
 - Updated `src/components/portfolio/Projects.tsx` with rail-only fixed card wrapper sizing and rail-specific card mode.

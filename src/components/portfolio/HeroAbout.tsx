@@ -94,7 +94,7 @@ export default function HeroAbout({ profile }: HeroAboutProps) {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 items-center">
           <div className="space-y-7 order-2 md:order-1">
             <div>
-              <h3 className="text-xs uppercase tracking-[0.2em] text-text-muted mb-3">About</h3>
+              <h3 className="text uppercase tracking-[0.2em] text-text-muted mb-3">About</h3>
               <div
                 className="bio-content text-text-secondary text-sm leading-relaxed"
                 dangerouslySetInnerHTML={{ __html: profile.bio }}
@@ -102,14 +102,14 @@ export default function HeroAbout({ profile }: HeroAboutProps) {
             </div>
 
             <div>
-              <h3 className="text-xs uppercase tracking-[0.2em] text-text-muted mb-3">Skills</h3>
+              <h3 className="text uppercase tracking-[0.2em] text-text-muted mb-3">Skills</h3>
               <p className="text-text-secondary text-sm leading-relaxed">
                 {profile.skills.join(" | ")}
               </p>
             </div>
 
             <div>
-              <h3 className="text-xs uppercase tracking-[0.2em] text-text-muted mb-3">Connect</h3>
+              <h3 className="text uppercase tracking-[0.2em] text-text-muted mb-3">Connect</h3>
               <div className="flex gap-3">
                 {profile.socials.map((social) => {
                   const Icon = iconMap[social.icon];

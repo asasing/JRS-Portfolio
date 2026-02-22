@@ -1,6 +1,6 @@
 ---
 name: portfolio-maintainer
-description: Maintain and evolve the JRS portfolio codebase across public UI, admin UI, JSON data contracts, and API normalization. Use when modifying Hero/Services/Projects/Certifications/Contact behavior, category/filter logic, media handling, contact SMTP semantics, or when syncing implementation changes with DESIGN_SYSTEM.md, CLAUDE.md, and README.md.
+description: Maintain and evolve the JRS portfolio codebase across public UI, admin UI, JSON data contracts, API normalization, and PostHog analytics. Use when modifying Hero/Services/Projects/Certifications/Contact behavior, category/filter logic, media handling, contact SMTP semantics, analytics event tracking, or when syncing implementation changes with DESIGN_SYSTEM.md, CLAUDE.md, and README.md.
 ---
 
 # Portfolio Maintainer

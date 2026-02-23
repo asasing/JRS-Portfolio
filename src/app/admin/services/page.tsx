@@ -92,9 +92,9 @@ export default function AdminServices() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <h1 className="text-2xl font-bold text-text-primary">Services</h1>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           {saved && <span className="text-sm text-year-green">Saved!</span>}
           <Button size="admin" variant="outline" onClick={addService}>+ Add Service</Button>
           <Button size="admin" onClick={handleSave} disabled={saving}>

@@ -77,10 +77,6 @@ export default function Contact({ profile }: ContactProps) {
               <h4 className="text-xs uppercase tracking-wider text-text-muted mb-2">Email</h4>
               <p className="text-text-primary text-sm md:text-base">{profile.email}</p>
             </div>
-            <div>
-              <h4 className="text-xs uppercase tracking-wider text-text-muted mb-2">Phone</h4>
-              <p className="text-text-primary text-sm md:text-base">{profile.phone}</p>
-            </div>
           </div>
         </div>
 

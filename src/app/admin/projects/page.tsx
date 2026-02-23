@@ -653,7 +653,7 @@ export default function AdminProjects() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <h1 className="text-2xl font-bold text-text-primary">Projects</h1>
         <Button size="admin" onClick={openNew}>
           <span className="flex items-center gap-2"><FaPlus size={12} /> Add Project</span>
@@ -661,9 +661,9 @@ export default function AdminProjects() {
       </div>
 
       <div className="bg-bg-card border border-border-subtle rounded-xl p-6 mb-6">
-        <div className="mb-4 flex items-center justify-between gap-3">
+        <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
           <h2 className="text-lg font-semibold text-text-primary">Category Manager</h2>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {categoriesSaved && <span className="text-sm text-year-green">Saved!</span>}
             <Button size="admin" variant="outline" onClick={addProjectCategory}>
               <span className="flex items-center gap-2">

@@ -130,7 +130,7 @@ export default function HeroAbout({ profile }: HeroAboutProps) {
             </div>
           </div>
 
-          <div className="flex justify-center order-1 md:order-2">
+          <div className="flex flex-col items-center order-1 md:order-2">
             <GlowPhoto
               src={profile.profilePhoto}
               alt={profile.name}
@@ -138,6 +138,11 @@ export default function HeroAbout({ profile }: HeroAboutProps) {
               focusY={profile.profilePhotoFocusY}
               zoom={profile.profilePhotoZoom}
             />
+            {profile.tagline && (
+              <p className="text-sm text-text-muted uppercase tracking-wider mt-4 text-center">
+                {profile.tagline}
+              </p>
+            )}
           </div>
 
           <div className="space-y-6 order-3 md:order-3">

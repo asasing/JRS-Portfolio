@@ -196,9 +196,11 @@ Supported icon source values:
 
 ### Hero (3-column desktop)
 ```
-[Left: About/Skills/Connect] [Center: GlowPhoto] [Right: Stats]
          Full-width code-style typed name above all columns
+[Left: About/Skills/Connect] [Center: GlowPhoto + Tagline] [Right: Stats]
 ```
+- Tagline renders below the profile photo in the center column.
+- Tagline uses stat-label styling: `text-sm text-text-muted uppercase tracking-wider`.
 
 ### Services
 ```
@@ -290,11 +292,15 @@ Anchors: `#about`, `#services`, `#portfolio`, `#certifications`, `#contact`.
 
 ### Layout
 ```
-[Sidebar 256px] [Main content area]
+Desktop: [Sidebar 256px] [Main content area]
+Mobile:  [Top bar ☰ JRS Admin] + [Slide-in sidebar drawer] + [Full-width content]
 ```
+- Sidebar is collapsible on mobile via hamburger toggle; always visible on `md+`.
+- Login page has its own layout override (no sidebar).
 
 ### Styling
 - Same dark token system as portfolio.
+- Admin header rows (title + action buttons) use `flex flex-wrap` with `gap` to prevent button overflow on mobile.
 - Shared form controls and button component.
 - Table/list rows use subtle hover feedback.
 - Projects and certifications ordering use drag-and-drop rows with explicit `Save Order` actions.

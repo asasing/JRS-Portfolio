@@ -222,7 +222,7 @@ export default function AdminProfile() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <h1 className="text-2xl font-bold text-text-primary">Profile Settings</h1>
         <div className="flex items-center gap-3">
           {saved && <span className="text-sm text-year-green">Saved!</span>}

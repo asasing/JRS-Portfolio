@@ -328,7 +328,7 @@ export default function AdminCertifications() {
 
   return (
     <div>
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
         <h1 className="text-2xl font-bold text-text-primary">Certifications</h1>
         <Button size="admin" onClick={openNew}>
           <span className="flex items-center gap-2"><FaPlus size={12} /> Add Certification</span>

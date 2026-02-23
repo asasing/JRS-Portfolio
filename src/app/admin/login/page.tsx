@@ -2,15 +2,14 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
+
 
 export default function AdminLogin() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,7 +24,7 @@ export default function AdminLogin() {
       });
 
       if (res.ok) {
-        router.push("/admin/profile");
+        window.location.href = "/admin/profile";
       } else {
         const data = await res.json();
         setError(data.error || "Invalid credentials");

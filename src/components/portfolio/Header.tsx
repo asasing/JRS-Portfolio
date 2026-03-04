@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { SITE_NAME } from "@/lib/constants";
+import { CALENDLY_URL, SITE_NAME } from "@/lib/constants";
 import MenuOverlay from "./MenuOverlay";
 
 export default function Header() {
@@ -27,6 +27,15 @@ export default function Header() {
               LET&apos;S TALK
               <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
             </button>
+            <a
+              href={CALENDLY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 border border-border-subtle rounded-full text-sm text-text-primary hover:border-accent-purple transition-colors"
+            >
+              BOOK A CALL
+              <span className="w-1.5 h-1.5 rounded-full bg-year-green" />
+            </a>
             <button
               onClick={() => setMenuOpen(true)}
               className="flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 bg-bg-card border border-border-subtle rounded-full text-sm text-text-primary hover:border-accent-purple transition-colors cursor-pointer"

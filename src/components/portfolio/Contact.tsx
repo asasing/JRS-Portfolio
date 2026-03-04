@@ -7,6 +7,7 @@ import Input from "@/components/ui/Input";
 import Button from "@/components/ui/Button";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { capture } from "@/lib/analytics";
+import { CALENDLY_URL } from "@/lib/constants";
 
 interface ContactProps {
   profile: Profile;
@@ -72,6 +73,18 @@ export default function Contact({ profile }: ContactProps) {
       <div className="site-container">
         <div className="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-12 mb-10 md:mb-12">
           <SectionHeading overline="CONTACT" title="Let's Talk" gradientWord="Talk" />
+          <div>
+            <h4 className="text-xs uppercase tracking-wider text-text-muted mb-2">Book a Call</h4>
+            <a
+              href={CALENDLY_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2 border border-border-subtle rounded-full text-sm text-text-primary hover:border-accent-purple transition-colors"
+            >
+              BOOK A CALL
+              <span className="w-1.5 h-1.5 rounded-full bg-year-green" />
+            </a>
+          </div>
           <div className="flex flex-row gap-8 md:gap-16 md:mt-2">
             <div>
               <h4 className="text-xs uppercase tracking-wider text-text-muted mb-2">Email</h4>

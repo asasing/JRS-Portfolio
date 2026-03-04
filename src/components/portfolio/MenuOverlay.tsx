@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { NAV_LINKS } from "@/lib/constants";
+import { CALENDLY_URL, NAV_LINKS } from "@/lib/constants";
 
 interface MenuOverlayProps {
   isOpen: boolean;
@@ -13,6 +13,13 @@ export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
     onClose();
     setTimeout(() => {
       document.querySelector(href)?.scrollIntoView({ behavior: "smooth" });
+    }, 300);
+  };
+
+  const handleCalendlyClick = () => {
+    onClose();
+    setTimeout(() => {
+      window.open(CALENDLY_URL, "_blank", "noopener,noreferrer");
     }, 300);
   };
 
@@ -57,6 +64,16 @@ export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
                 )}
               </motion.button>
             ))}
+            <motion.button
+              initial={{ opacity: 0, x: -30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: 0.1 + NAV_LINKS.length * 0.08 }}
+              onClick={handleCalendlyClick}
+              className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-sm text-white hover:border-white/50 transition-colors cursor-pointer"
+            >
+              BOOK A CALL
+              <span className="w-1.5 h-1.5 rounded-full bg-year-green" />
+            </motion.button>
           </nav>
         </motion.div>
       )}

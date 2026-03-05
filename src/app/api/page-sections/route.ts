@@ -14,13 +14,13 @@ function normalizePageSections(input: unknown): PageSection[] {
   if (!Array.isArray(input)) return [];
 
   return input
-    .map((item, index) => {
+    .map((item, index): PageSection | null => {
       const row = (item ?? {}) as Partial<PageSection>;
       const id = typeof row.id === "string" ? row.id.trim() : "";
       const key = typeof row.key === "string" ? row.key.trim() : "";
       if (!id || !key) return null;
-
-      return {
+      const content = normalizeContent(row.content);
+      const normalized: PageSection = {
         id,
         key,
         label:
@@ -30,12 +30,20 @@ function normalizePageSections(input: unknown): PageSection[] {
         order: Number.isFinite(row.order) ? Number(row.order) : index + 1,
         visible: row.visible !== false,
         isCustom: row.isCustom === true,
-        content: normalizeContent(row.content),
-      } satisfies PageSection;
+      };
+      if (content !== undefined) {
+        normalized.content = content;
+      }
+      return normalized;
     })
     .filter((section): section is PageSection => section !== null)
     .sort((a, b) => a.order - b.order)
-    .map((section, index) => ({ ...section, order: index + 1 }));
+    .map(
+      (section, index): PageSection => ({
+        ...section,
+        order: index + 1,
+      })
+    );
 }
 
 export async function GET() {

@@ -22,7 +22,12 @@ function normalizeEngagementModels(input: unknown): EngagementModel[] {
     })
     .filter((model): model is EngagementModel => model !== null)
     .sort((a, b) => a.order - b.order)
-    .map((model, index) => ({ ...model, order: index + 1 }));
+    .map(
+      (model, index): EngagementModel => ({
+        ...model,
+        order: index + 1,
+      })
+    );
 }
 
 export async function GET() {

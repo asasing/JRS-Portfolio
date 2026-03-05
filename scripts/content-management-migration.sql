@@ -64,7 +64,7 @@ VALUES
     3,
     true,
     false,
-    '{"heading":"How I Work","intro":"To keep projects focused and predictable, engagements follow a structured three-phase delivery model.","steps":[{"title":"Discovery & Planning","description":"To keep projects focused and predictable, engagements follow a structured three-phase delivery model."},{"title":"Build & Integration","description":"The solution is developed and integrated with your existing systems while keeping security, governance, and maintainability in focus."},{"title":"Deployment, Training & Handover","description":"A 14-day post-deployment warranty period is included to address any issues and ensure the system operates smoothly."}]}'::jsonb
+    '{"heading":"How I Work","intro":"To keep projects focused and predictable, engagements follow a structured three-phase delivery model.","steps":[{"title":"Discovery & Planning","description":"To keep projects focused and predictable, engagements follow a structured three-phase delivery model.","image":"/images/services/how-i-work-discovery.svg"},{"title":"Build & Integration","description":"The solution is developed and integrated with your existing systems while keeping security, governance, and maintainability in focus.","image":"/images/services/how-i-work-build.svg"},{"title":"Deployment, Training & Handover","description":"A 14-day post-deployment warranty period is included to address any issues and ensure the system operates smoothly.","image":"/images/services/how-i-work-deploy.svg"}]}'::jsonb
   ),
   (
     'section-engagement-models',
@@ -112,6 +112,27 @@ VALUES
     '{}'
   )
 ON CONFLICT (id) DO NOTHING;
+
+-- Ensure the built-in services section includes default step images for existing rows.
+UPDATE page_sections
+SET content = jsonb_set(
+  jsonb_set(
+    jsonb_set(
+      content,
+      '{steps,0,image}',
+      to_jsonb('/images/services/how-i-work-discovery.svg'::text),
+      true
+    ),
+    '{steps,1,image}',
+    to_jsonb('/images/services/how-i-work-build.svg'::text),
+    true
+  ),
+  '{steps,2,image}',
+  to_jsonb('/images/services/how-i-work-deploy.svg'::text),
+  true
+)
+WHERE key = 'services'
+  AND is_custom = false;
 
 -- Seed engagement models with current defaults.
 INSERT INTO engagement_models (id, title, description, sort_order)

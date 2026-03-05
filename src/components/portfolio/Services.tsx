@@ -21,23 +21,32 @@ interface ServicesProps {
   sectionContent?: PageSectionContent;
 }
 
+interface DeliveryStep {
+  title: string;
+  description: string;
+  image?: string;
+}
+
 const DELIVERY_STEP_TITLE_PREFIX = /^step\s*:/i;
 
-const DEFAULT_DELIVERY_STEPS = [
+const DEFAULT_DELIVERY_STEPS: DeliveryStep[] = [
   {
     title: "Discovery & Planning",
     description:
       "To keep projects focused and predictable, engagements follow a structured three-phase delivery model.",
+    image: "/images/services/how-i-work-discovery.svg",
   },
   {
     title: "Build & Integration",
     description:
       "The solution is developed and integrated with your existing systems while keeping security, governance, and maintainability in focus.",
+    image: "/images/services/how-i-work-build.svg",
   },
   {
     title: "Deployment, Training & Handover",
     description:
       "A 14-day post-deployment warranty period is included to address any issues and ensure the system operates smoothly.",
+    image: "/images/services/how-i-work-deploy.svg",
   },
 ];
 
@@ -57,18 +66,19 @@ export default function Services({ services, sectionContent }: ServicesProps) {
   const additionalServices = sortedServices.filter(
     (service) => !DELIVERY_STEP_TITLE_PREFIX.test(service.title.trim())
   );
-  const configuredSteps = Array.isArray(sectionContent?.steps)
+  const configuredSteps: DeliveryStep[] = Array.isArray(sectionContent?.steps)
     ? sectionContent.steps
         .map((step) => ({
           title: typeof step?.title === "string" ? step.title.trim() : "",
           description:
             typeof step?.description === "string" ? step.description.trim() : "",
+          image: typeof step?.image === "string" ? step.image.trim() : "",
         }))
         .filter((step) => step.title && step.description)
         .slice(0, 3)
     : [];
 
-  const deliverySteps =
+  const deliverySteps: DeliveryStep[] =
     configuredSteps.length > 0
       ? configuredSteps
       : taggedStepServices.length > 0
@@ -77,6 +87,7 @@ export default function Services({ services, sectionContent }: ServicesProps) {
               service.title.replace(DELIVERY_STEP_TITLE_PREFIX, "").trim() ||
               service.title.trim(),
             description: service.description,
+            image: "",
           }))
         : DEFAULT_DELIVERY_STEPS;
 
@@ -110,8 +121,22 @@ export default function Services({ services, sectionContent }: ServicesProps) {
                 </h3>
               </div>
 
-              <div className="bio-content text-sm leading-relaxed text-text-secondary md:text-[0.95rem]">
-                {renderDescription(step.description)}
+              <div className="flex flex-col gap-4 md:flex-row md:items-start">
+                <div className="bio-content text-sm leading-relaxed text-text-secondary md:flex-1 md:text-[0.95rem]">
+                  {renderDescription(step.description)}
+                </div>
+                {step.image && (
+                  <div className="relative h-44 w-full overflow-hidden rounded-xl border border-border-subtle bg-bg-input md:h-28 md:w-48 md:shrink-0">
+                    <Image
+                      src={step.image}
+                      alt={`${step.title} stage`}
+                      width={384}
+                      height={224}
+                      className="h-full w-full object-cover"
+                      unoptimized
+                    />
+                  </div>
+                )}
               </div>
             </div>
           ))}

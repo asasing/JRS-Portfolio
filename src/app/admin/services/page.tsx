@@ -6,6 +6,7 @@ import { PageSection, Service } from "@/lib/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
+import ImageUploader from "@/components/admin/ImageUploader";
 import { FaSave, FaCloudUploadAlt } from "react-icons/fa";
 
 function isImageIcon(icon: string): boolean {
@@ -16,6 +17,7 @@ function isImageIcon(icon: string): boolean {
 interface HowIWorkStep {
   title: string;
   description: string;
+  image?: string;
 }
 
 interface HowIWorkConfig {
@@ -33,16 +35,19 @@ const DEFAULT_HOW_I_WORK: HowIWorkConfig = {
       title: "Discovery & Planning",
       description:
         "To keep projects focused and predictable, engagements follow a structured three-phase delivery model.",
+      image: "/images/services/how-i-work-discovery.svg",
     },
     {
       title: "Build & Integration",
       description:
         "The solution is developed and integrated with your existing systems while keeping security, governance, and maintainability in focus.",
+      image: "/images/services/how-i-work-build.svg",
     },
     {
       title: "Deployment, Training & Handover",
       description:
         "A 14-day post-deployment warranty period is included to address any issues and ensure the system operates smoothly.",
+      image: "/images/services/how-i-work-deploy.svg",
     },
   ],
 };
@@ -55,13 +60,17 @@ function normalizeHowIWorkContent(content: unknown): HowIWorkConfig {
   const value = content as Record<string, unknown>;
   const stepsInput = Array.isArray(value.steps) ? value.steps : [];
   const steps = stepsInput
-    .map((step) => {
+    .map((step): HowIWorkStep | null => {
       if (!step || typeof step !== "object" || Array.isArray(step)) return null;
       const row = step as Record<string, unknown>;
-      return {
+      const normalized: HowIWorkStep = {
         title: typeof row.title === "string" ? row.title : "",
         description: typeof row.description === "string" ? row.description : "",
       };
+      if (typeof row.image === "string") {
+        normalized.image = row.image;
+      }
+      return normalized;
     })
     .filter((step): step is HowIWorkStep => step !== null)
     .slice(0, 3);
@@ -270,6 +279,12 @@ export default function AdminServices() {
                       onChange={(event) =>
                         updateHowIWorkStep(index, "description", event.target.value)
                       }
+                    />
+                    <ImageUploader
+                      label="Step Image"
+                      category="services"
+                      value={step.image || ""}
+                      onChange={(path) => updateHowIWorkStep(index, "image", path)}
                     />
                   </div>
                 </div>

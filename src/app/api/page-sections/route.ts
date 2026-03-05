@@ -7,7 +7,45 @@ function normalizeContent(value: unknown): PageSection["content"] {
   if (!value || typeof value !== "object" || Array.isArray(value)) {
     return undefined;
   }
-  return value as PageSection["content"];
+  const raw = value as Record<string, unknown>;
+  const normalized: NonNullable<PageSection["content"]> = {};
+
+  if (typeof raw.title === "string") normalized.title = raw.title;
+  if (typeof raw.bodyHtml === "string") normalized.bodyHtml = raw.bodyHtml;
+  if (typeof raw.heading === "string") normalized.heading = raw.heading;
+  if (typeof raw.intro === "string") normalized.intro = raw.intro;
+
+  if (Array.isArray(raw.items)) {
+    normalized.items = raw.items
+      .filter((item): item is string => typeof item === "string")
+      .map((item) => item.trim())
+      .filter(Boolean);
+  }
+
+  if (Array.isArray(raw.steps)) {
+    normalized.steps = raw.steps
+      .map(
+        (
+          step
+        ): { title: string; description: string; image?: string } | null => {
+        if (!step || typeof step !== "object" || Array.isArray(step)) return null;
+        const row = step as Record<string, unknown>;
+        const normalizedStep: { title: string; description: string; image?: string } = {
+          title: typeof row.title === "string" ? row.title : "",
+          description: typeof row.description === "string" ? row.description : "",
+        };
+        if (typeof row.image === "string") {
+          normalizedStep.image = row.image;
+        }
+        return normalizedStep;
+      })
+      .filter(
+        (step): step is { title: string; description: string; image?: string } =>
+          step !== null
+      );
+  }
+
+  return normalized;
 }
 
 function normalizePageSections(input: unknown): PageSection[] {

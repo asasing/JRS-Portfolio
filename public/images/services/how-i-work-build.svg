@@ -1,0 +1,27 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="90" y1="20" x2="1110" y2="680" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#171726"/>
+      <stop offset="1" stop-color="#0A0A12"/>
+    </linearGradient>
+    <linearGradient id="panel" x1="260" y1="280" x2="940" y2="510" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1F1F33"/>
+      <stop offset="1" stop-color="#141423"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" rx="36" fill="url(#bg)"/>
+  <rect x="90" y="90" width="1020" height="520" rx="28" fill="#101019" stroke="#2B2B3A" stroke-width="2"/>
+  <text x="150" y="170" fill="#BFBFD4" font-size="36" font-family="Segoe UI, Arial, sans-serif">Build &amp; Integration</text>
+  <rect x="190" y="240" width="820" height="300" rx="20" fill="url(#panel)" stroke="#343451"/>
+  <rect x="240" y="300" width="320" height="40" rx="8" fill="#2C2C44"/>
+  <rect x="240" y="360" width="380" height="18" rx="9" fill="#8B5CF6"/>
+  <rect x="240" y="390" width="300" height="18" rx="9" fill="#5B8CFF"/>
+  <rect x="240" y="420" width="420" height="18" rx="9" fill="#24C1A0"/>
+  <rect x="700" y="300" width="250" height="170" rx="14" fill="#161629" stroke="#343451"/>
+  <circle cx="760" cy="350" r="20" fill="#8B5CF6"/>
+  <circle cx="825" cy="350" r="20" fill="#5B8CFF"/>
+  <circle cx="890" cy="350" r="20" fill="#24C1A0"/>
+  <line x1="760" y1="390" x2="890" y2="390" stroke="#8E8EAF" stroke-width="6" stroke-linecap="round"/>
+  <text x="730" y="440" fill="#A4A4BF" font-size="22" font-family="Segoe UI, Arial, sans-serif">System Connectors</text>
+  <text x="240" y="490" fill="#A4A4BF" font-size="24" font-family="Segoe UI, Arial, sans-serif">Secure build pipeline " API integrations " Governance</text>
+</svg>

@@ -78,7 +78,7 @@ export interface PageSectionContent {
   items?: string[];
   heading?: string;
   intro?: string;
-  steps?: { title: string; description: string }[];
+  steps?: { title: string; description: string; image?: string }[];
 }
 
 export interface PageSection {

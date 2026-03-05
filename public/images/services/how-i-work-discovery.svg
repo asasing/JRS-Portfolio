@@ -1,0 +1,27 @@
+<svg width="1200" height="700" viewBox="0 0 1200 700" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="120" y1="40" x2="1080" y2="640" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#1A1A26"/>
+      <stop offset="1" stop-color="#0E0E14"/>
+    </linearGradient>
+    <linearGradient id="line" x1="200" y1="230" x2="1000" y2="230" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#9A66FF"/>
+      <stop offset="1" stop-color="#4DD1FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="700" rx="36" fill="url(#bg)"/>
+  <rect x="90" y="90" width="1020" height="520" rx="28" fill="#11111A" stroke="#2B2B3A" stroke-width="2"/>
+  <text x="150" y="170" fill="#BFBFD4" font-size="36" font-family="Segoe UI, Arial, sans-serif">Discovery &amp; Planning</text>
+  <line x1="200" y1="230" x2="1000" y2="230" stroke="url(#line)" stroke-width="6" stroke-linecap="round"/>
+  <circle cx="280" cy="230" r="26" fill="#9A66FF"/>
+  <circle cx="600" cy="230" r="18" fill="#3A3A4D"/>
+  <circle cx="920" cy="230" r="18" fill="#3A3A4D"/>
+  <rect x="190" y="300" width="320" height="200" rx="16" fill="#171724" stroke="#2E2E44"/>
+  <text x="220" y="358" fill="#E5E5F2" font-size="28" font-family="Segoe UI, Arial, sans-serif">Requirements</text>
+  <text x="220" y="402" fill="#A4A4BF" font-size="24" font-family="Segoe UI, Arial, sans-serif">Stakeholders " Scope</text>
+  <text x="220" y="442" fill="#A4A4BF" font-size="24" font-family="Segoe UI, Arial, sans-serif">Architecture Notes</text>
+  <rect x="560" y="300" width="420" height="200" rx="16" fill="#171724" stroke="#2E2E44"/>
+  <text x="590" y="358" fill="#E5E5F2" font-size="28" font-family="Segoe UI, Arial, sans-serif">Project Blueprint</text>
+  <text x="590" y="402" fill="#A4A4BF" font-size="24" font-family="Segoe UI, Arial, sans-serif">Timeline " Risk Review</text>
+  <text x="590" y="442" fill="#A4A4BF" font-size="24" font-family="Segoe UI, Arial, sans-serif">Success Metrics</text>
+</svg>

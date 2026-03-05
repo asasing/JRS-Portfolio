@@ -4,6 +4,8 @@ import {
   getProjectCategories,
   getServices,
   getCertifications,
+  getPageSections,
+  getEngagementModels,
 } from "@/lib/data";
 import PortfolioClient from "@/components/portfolio/PortfolioClient";
 import { normalizeProfileData } from "@/lib/profile-normalizers";
@@ -24,6 +26,8 @@ export default async function Home() {
   );
   const services = await getServices();
   const certifications = await getCertifications();
+  const pageSections = await getPageSections();
+  const engagementModels = await getEngagementModels();
 
   return (
     <PortfolioClient
@@ -32,6 +36,8 @@ export default async function Home() {
       projectCategories={projectCategories}
       services={services}
       certifications={certifications}
+      pageSections={pageSections}
+      engagementModels={engagementModels}
     />
   );
 }

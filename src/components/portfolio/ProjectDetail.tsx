@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import { useState } from "react";
 import Image from "next/image";
@@ -13,6 +13,13 @@ interface ProjectDetailProps {
   project: Project;
   onClose: () => void;
 }
+
+const DEFAULT_PROJECT_DESCRIPTION = `
+  <p><strong>Client Context:</strong><br />Enterprise Engineering Team</p>
+  <p><strong>Problem:</strong><br />Operational data stored in Dataverse slowed reporting and limited analytics.</p>
+  <p><strong>Solution:</strong><br />Designed and implemented a data pipeline to Azure SQL for improved reporting and analytics.</p>
+  <p><strong>Outcome:</strong><br />Improved reporting performance and enabled scalable analytics capabilities.</p>
+`;
 
 function getProjectCategories(project: Project): string[] {
   const categories = Array.isArray(project.categories)
@@ -35,6 +42,9 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
   );
   const activeImage = images[currentImage] || images[0] || fallbackThumbnail;
   const categoryLabel = getProjectCategories(project).join(" • ");
+  const descriptionHtml = project.description?.trim()
+    ? project.description
+    : DEFAULT_PROJECT_DESCRIPTION;
 
   const prevImage = () => {
     setCurrentImage((prev) => (prev === 0 ? images.length - 1 : prev - 1));
@@ -108,7 +118,7 @@ export default function ProjectDetail({ project, onClose }: ProjectDetailProps) 
           <h3 className="text-2xl font-bold text-text-primary mt-1 mb-3">{project.title}</h3>
           <div
             className="bio-content text-text-secondary leading-relaxed mb-6"
-            dangerouslySetInnerHTML={{ __html: project.description }}
+            dangerouslySetInnerHTML={{ __html: descriptionHtml }}
           />
 
           <div className="flex flex-wrap gap-3">

@@ -6,9 +6,14 @@ import { CALENDLY_URL, NAV_LINKS } from "@/lib/constants";
 interface MenuOverlayProps {
   isOpen: boolean;
   onClose: () => void;
+  navLinks?: { label: string; href: string }[];
 }
 
-export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
+export default function MenuOverlay({
+  isOpen,
+  onClose,
+  navLinks = NAV_LINKS.map((item) => ({ label: item.label, href: item.href })),
+}: MenuOverlayProps) {
   const handleNavClick = (href: string) => {
     onClose();
     setTimeout(() => {
@@ -46,9 +51,9 @@ export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
           </button>
 
           <nav className="flex flex-col items-start gap-6">
-            {NAV_LINKS.map((link, i) => (
+            {navLinks.map((link, i) => (
               <motion.button
-                key={link.label}
+                key={`${link.href}-${link.label}`}
                 initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 + i * 0.08 }}
@@ -67,7 +72,7 @@ export default function MenuOverlay({ isOpen, onClose }: MenuOverlayProps) {
             <motion.button
               initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 + NAV_LINKS.length * 0.08 }}
+              transition={{ delay: 0.1 + navLinks.length * 0.08 }}
               onClick={handleCalendlyClick}
               className="mt-2 inline-flex items-center gap-2 px-5 py-2.5 border border-white/20 rounded-full text-sm text-white hover:border-white/50 transition-colors cursor-pointer"
             >

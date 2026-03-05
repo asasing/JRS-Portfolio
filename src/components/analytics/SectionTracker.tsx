@@ -3,7 +3,16 @@
 import { useEffect, useRef } from "react";
 import { capture } from "@/lib/analytics";
 
-const SECTIONS = ["about", "services", "portfolio", "certifications", "contact"] as const;
+const SECTIONS = [
+  "about",
+  "problems",
+  "services",
+  "engagement-models",
+  "portfolio",
+  "certifications",
+  "technologies",
+  "contact",
+] as const;
 
 export default function SectionTracker() {
   const viewed = useRef(new Set<string>());

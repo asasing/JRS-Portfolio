@@ -2,6 +2,8 @@ export interface Profile {
   name: string;
   tagline: string;
   bio: string;
+  heroHeadline?: string;
+  heroSupportingLine?: string;
   profilePhoto: string;
   experienceStartYear: number;
   profilePhotoFocusX?: number;
@@ -67,5 +69,31 @@ export interface Service {
   title: string;
   description: string;
   icon: string;
+  order: number;
+}
+
+export interface PageSectionContent {
+  title?: string;
+  bodyHtml?: string;
+  items?: string[];
+  heading?: string;
+  intro?: string;
+  steps?: { title: string; description: string }[];
+}
+
+export interface PageSection {
+  id: string;
+  key: string;
+  label: string;
+  order: number;
+  visible: boolean;
+  isCustom: boolean;
+  content?: PageSectionContent;
+}
+
+export interface EngagementModel {
+  id: string;
+  title: string;
+  description: string;
   order: number;
 }

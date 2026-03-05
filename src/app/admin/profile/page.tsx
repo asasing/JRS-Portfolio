@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { Profile } from "@/lib/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
+import Textarea from "@/components/ui/Textarea";
 import ImageUploader from "@/components/admin/ImageUploader";
 import RichTextEditor from "@/components/admin/RichTextEditor";
 import { FaSave, FaTimes, FaPlus, FaGripVertical } from "react-icons/fa";
@@ -26,7 +27,7 @@ import {
 import { CSS } from "@dnd-kit/utilities";
 
 const emptyProfile: Profile = {
-  name: "", tagline: "", bio: "", profilePhoto: "",
+  name: "", tagline: "", bio: "", heroHeadline: "", heroSupportingLine: "", profilePhoto: "",
   experienceStartYear: 2018,
   profilePhotoFocusX: 50,
   profilePhotoFocusY: 50,
@@ -38,6 +39,9 @@ const emptyProfile: Profile = {
 const normalizeProfile = (raw: Partial<Profile>): Profile => ({
   ...emptyProfile,
   ...raw,
+  heroHeadline: typeof raw.heroHeadline === "string" ? raw.heroHeadline : "",
+  heroSupportingLine:
+    typeof raw.heroSupportingLine === "string" ? raw.heroSupportingLine : "",
   experienceStartYear:
     Number.isFinite(raw.experienceStartYear) && Number(raw.experienceStartYear) > 0
       ? Number(raw.experienceStartYear)
@@ -240,6 +244,18 @@ export default function AdminProfile() {
           <h2 className="text-lg font-semibold text-text-primary mb-4">Basic Info</h2>
           <Input label="Name" value={profile.name} onChange={(e) => setProfile({ ...profile, name: e.target.value })} />
           <Input label="Tagline" value={profile.tagline} onChange={(e) => setProfile({ ...profile, tagline: e.target.value })} />
+          <Textarea
+            label="Hero Headline"
+            value={profile.heroHeadline || ""}
+            onChange={(e) => setProfile({ ...profile, heroHeadline: e.target.value })}
+          />
+          <Textarea
+            label="Hero Supporting Line"
+            value={profile.heroSupportingLine || ""}
+            onChange={(e) =>
+              setProfile({ ...profile, heroSupportingLine: e.target.value })
+            }
+          />
           <RichTextEditor label="Bio" value={profile.bio} onChange={(bio) => setProfile({ ...profile, bio })} />
           <Input
             type="number"

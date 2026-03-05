@@ -6,6 +6,10 @@ import { Profile } from "@/lib/types";
 const DEFAULT_EXPERIENCE_START_YEAR = 2018;
 const DEFAULT_FOCUS = 50;
 const DEFAULT_ZOOM = 1;
+const DEFAULT_HERO_HEADLINE =
+  "I help organisations eliminate manual processes and fragmented systems by building scalable internal platforms using Microsoft Power Platform, Azure, and modern automation tools.";
+const DEFAULT_HERO_SUPPORTING_LINE =
+  "From workflow automation to internal business systems, I design solutions that reduce operational friction while remaining secure, scalable, and maintainable.";
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -161,10 +165,18 @@ export function coerceLegacyBioToHtml(input: unknown): string {
 }
 
 export function normalizeProfileData(raw: Partial<Profile>): Profile {
+  const heroHeadline = typeof raw.heroHeadline === "string" ? raw.heroHeadline.trim() : "";
+  const heroSupportingLine =
+    typeof raw.heroSupportingLine === "string"
+      ? raw.heroSupportingLine.trim()
+      : "";
+
   return {
     name: raw.name || "",
     tagline: raw.tagline || "",
     bio: coerceLegacyBioToHtml(raw.bio),
+    heroHeadline: heroHeadline || DEFAULT_HERO_HEADLINE,
+    heroSupportingLine: heroSupportingLine || DEFAULT_HERO_SUPPORTING_LINE,
     profilePhoto: raw.profilePhoto || "",
     experienceStartYear: normalizeExperienceStartYear(raw.experienceStartYear),
     profilePhotoFocusX: normalizeFocusValue(raw.profilePhotoFocusX, DEFAULT_FOCUS),

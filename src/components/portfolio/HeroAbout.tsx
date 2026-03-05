@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Profile } from "@/lib/types";
 import GlowPhoto from "./GlowPhoto";
 import StatsCounter from "./StatsCounter";
 import { FaLinkedinIn, FaGithub, FaEnvelope, FaTwitter } from "react-icons/fa";
+import Button from "@/components/ui/Button";
+import { CALENDLY_URL } from "@/lib/constants";
 
 const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
   FaLinkedinIn,
@@ -17,10 +18,27 @@ interface HeroAboutProps {
   profile: Profile;
 }
 
-export default function HeroAbout({ profile }: HeroAboutProps) {
-  const [typedName, setTypedName] = useState("");
-  const [isTypingDone, setIsTypingDone] = useState(false);
+const HERO_HEADLINE =
+  "I help organisations eliminate manual processes and fragmented systems by building scalable internal platforms using Microsoft Power Platform, Azure, and modern automation tools.";
 
+const HERO_SUPPORTING_LINE =
+  "From workflow automation to internal business systems, I design solutions that reduce operational friction while remaining secure, scalable, and maintainable.";
+
+const DEFAULT_ABOUT_HTML = `
+  <p>I design and deliver secure, scalable business systems that streamline operations and reduce manual workload.</p>
+  <p>Using the Microsoft ecosystem (Power Platform, Azure) alongside modern development tools and AI-driven automation, I help organisations replace fragmented spreadsheets and legacy workflows with structured, governed systems built for long-term reliability.</p>
+  <p>My work typically focuses on:</p>
+  <ul>
+    <li>operational workflow automation</li>
+    <li>internal business applications and portals</li>
+    <li>CRM and data platform modernization</li>
+    <li>integrations between business systems and APIs</li>
+    <li>AI-assisted automation and decision workflows</li>
+  </ul>
+  <p>From discovery to deployment, I take ownership of the solution lifecycle - ensuring systems are practical, maintainable, and aligned with real business outcomes.</p>
+`;
+
+export default function HeroAbout({ profile }: HeroAboutProps) {
   const currentYear = new Date().getFullYear();
   const startYear = Number.isFinite(profile.experienceStartYear)
     ? profile.experienceStartYear
@@ -38,58 +56,41 @@ export default function HeroAbout({ profile }: HeroAboutProps) {
           : stat
       )
     : [{ label: "Years of Experience", value: experienceValue }, ...profile.stats];
-
-  useEffect(() => {
-    const fullName = profile.name || "";
-    const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
-    let interval: number | undefined;
-
-    const frame = window.requestAnimationFrame(() => {
-      if (!fullName || reducedMotion) {
-        setTypedName(fullName);
-        setIsTypingDone(true);
-        return;
-      }
-
-      setTypedName("");
-      setIsTypingDone(false);
-
-      let nextIndex = 0;
-      interval = window.setInterval(() => {
-        nextIndex += 1;
-        setTypedName(fullName.slice(0, nextIndex));
-
-        if (nextIndex >= fullName.length) {
-          window.clearInterval(interval);
-          setIsTypingDone(true);
-        }
-      }, 70);
-    });
-
-    return () => {
-      window.cancelAnimationFrame(frame);
-      if (interval) {
-        window.clearInterval(interval);
-      }
-    };
-  }, [profile.name]);
+  const aboutHtml = profile.bio?.trim() ? profile.bio : DEFAULT_ABOUT_HTML;
+  const heroHeadline = profile.heroHeadline?.trim() || HERO_HEADLINE;
+  const heroSupportingLine =
+    profile.heroSupportingLine?.trim() || HERO_SUPPORTING_LINE;
 
   return (
     <section id="about" className="min-h-screen flex items-center pt-20">
       <div className="site-container">
-        <h1 className="hero-code-title">
-          <span className="hero-code-title__text" aria-label={profile.name}>
-            <span className="hero-code-title__typed">{typedName}</span>
-            <span
-              className={`hero-code-title__cursor ${
-                isTypingDone ? "" : "hero-code-title__cursor--typing"
-              }`}
-              aria-hidden="true"
-            >
-              |
-            </span>
-          </span>
-        </h1>
+        <div className="mx-auto mb-12 max-w-5xl space-y-5 text-center">
+          <h1
+            className="text-text-primary text-[18px] leading-relaxed font-semibold"
+            style={{
+              backgroundClip: "unset",
+              WebkitBackgroundClip: "unset",
+              color: "rgba(255, 255, 255, 1)",
+            }}
+          >
+            {heroHeadline}
+          </h1>
+          <p className="mx-auto max-w-4xl text-sm leading-relaxed text-text-secondary md:text-base">
+            {heroSupportingLine}
+          </p>
+          <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+            <a href={CALENDLY_URL} target="_blank" rel="noopener noreferrer">
+              <Button>
+                Book a Discovery Call
+              </Button>
+            </a>
+            <a href="#portfolio">
+              <Button variant="outline">
+                View Recent Projects
+              </Button>
+            </a>
+          </div>
+        </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-12 items-center">
           <div className="space-y-7 order-2 md:order-1">
@@ -97,15 +98,8 @@ export default function HeroAbout({ profile }: HeroAboutProps) {
               <h3 className="text-xs uppercase tracking-[0.2em] text-text-muted mb-3">About</h3>
               <div
                 className="bio-content text-text-secondary text-sm leading-relaxed"
-                dangerouslySetInnerHTML={{ __html: profile.bio }}
+                dangerouslySetInnerHTML={{ __html: aboutHtml }}
               />
-            </div>
-
-            <div>
-              <h3 className="text-xs uppercase tracking-[0.2em] text-text-muted mb-3">Skills</h3>
-              <p className="text-text-secondary text-sm leading-relaxed">
-                {profile.skills.join(" | ")}
-              </p>
             </div>
 
             <div>

@@ -4,7 +4,11 @@ import { useState } from "react";
 import { CALENDLY_URL, SITE_NAME } from "@/lib/constants";
 import MenuOverlay from "./MenuOverlay";
 
-export default function Header() {
+interface HeaderProps {
+  navLinks: { label: string; href: string }[];
+}
+
+export default function Header({ navLinks }: HeaderProps) {
   const [menuOpen, setMenuOpen] = useState(false);
 
   const scrollToContact = () => {
@@ -24,7 +28,7 @@ export default function Header() {
               onClick={scrollToContact}
               className="hidden sm:flex items-center gap-2 px-4 md:px-5 py-2 md:py-2.5 border border-border-subtle rounded-full text-sm text-text-primary hover:border-accent-purple transition-colors cursor-pointer"
             >
-              LET&apos;S TALK
+              Send a Message
               <span className="w-1.5 h-1.5 rounded-full bg-accent-purple" />
             </button>
             <a
@@ -47,7 +51,11 @@ export default function Header() {
         </div>
       </header>
 
-      <MenuOverlay isOpen={menuOpen} onClose={() => setMenuOpen(false)} />
+      <MenuOverlay
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        navLinks={navLinks}
+      />
     </>
   );
 }

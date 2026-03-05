@@ -7,6 +7,9 @@ import {
   ProjectCategory,
   Service,
   Certification,
+  PageSection,
+  EngagementModel,
+  PageSectionContent,
 } from "@/lib/types";
 
 // ---------------------------------------------------------------------------
@@ -29,6 +32,8 @@ interface ProfileRow {
   email: string;
   phone: string;
   favicon: string;
+  hero_headline: string;
+  hero_supporting_line: string;
 }
 
 function profileFromRow(row: ProfileRow): Profile {
@@ -47,6 +52,8 @@ function profileFromRow(row: ProfileRow): Profile {
     email: row.email,
     phone: row.phone,
     favicon: row.favicon,
+    heroHeadline: row.hero_headline,
+    heroSupportingLine: row.hero_supporting_line,
   };
 }
 
@@ -66,6 +73,8 @@ function profileToRow(p: Profile): Omit<ProfileRow, "id"> {
     email: p.email,
     phone: p.phone,
     favicon: p.favicon ?? "",
+    hero_headline: p.heroHeadline ?? "",
+    hero_supporting_line: p.heroSupportingLine ?? "",
   };
 }
 
@@ -214,6 +223,70 @@ function certToRow(c: Certification): CertificationRow {
   };
 }
 
+interface PageSectionRow {
+  id: string;
+  key: string;
+  label: string;
+  sort_order: number;
+  visible: boolean;
+  is_custom: boolean;
+  content: unknown;
+}
+
+function normalizeSectionContent(value: unknown): PageSectionContent | undefined {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return undefined;
+  return value as PageSectionContent;
+}
+
+function pageSectionFromRow(row: PageSectionRow): PageSection {
+  return {
+    id: row.id,
+    key: row.key,
+    label: row.label,
+    order: row.sort_order,
+    visible: row.visible,
+    isCustom: row.is_custom,
+    content: normalizeSectionContent(row.content),
+  };
+}
+
+function pageSectionToRow(section: PageSection): PageSectionRow {
+  return {
+    id: section.id,
+    key: section.key,
+    label: section.label,
+    sort_order: section.order,
+    visible: section.visible,
+    is_custom: section.isCustom,
+    content: section.content ?? {},
+  };
+}
+
+interface EngagementModelRow {
+  id: string;
+  title: string;
+  description: string;
+  sort_order: number;
+}
+
+function engagementModelFromRow(row: EngagementModelRow): EngagementModel {
+  return {
+    id: row.id,
+    title: row.title,
+    description: row.description,
+    order: row.sort_order,
+  };
+}
+
+function engagementModelToRow(model: EngagementModel): EngagementModelRow {
+  return {
+    id: model.id,
+    title: model.title,
+    description: model.description,
+    sort_order: model.order,
+  };
+}
+
 // ---------------------------------------------------------------------------
 // Profile
 // ---------------------------------------------------------------------------
@@ -237,6 +310,8 @@ export async function getProfile(): Promise<Profile> {
       socials: [],
       email: "",
       phone: "",
+      heroHeadline: "",
+      heroSupportingLine: "",
     };
   }
 
@@ -402,6 +477,66 @@ export async function updateServices(services: Service[]): Promise<Service[]> {
   }
 
   return getServices();
+}
+
+// ---------------------------------------------------------------------------
+// Page Sections
+// ---------------------------------------------------------------------------
+
+export async function getPageSections(): Promise<PageSection[]> {
+  const { data, error } = await supabase
+    .from("page_sections")
+    .select("*")
+    .order("sort_order", { ascending: true });
+
+  if (error) return [];
+  return (data as PageSectionRow[]).map(pageSectionFromRow);
+}
+
+export async function updatePageSections(
+  sections: PageSection[]
+): Promise<PageSection[]> {
+  await supabaseAdmin.from("page_sections").delete().neq("id", "");
+
+  if (sections.length > 0) {
+    const rows = sections.map(pageSectionToRow);
+    const { error } = await supabaseAdmin.from("page_sections").insert(rows);
+    if (error)
+      throw new Error(`Failed to update page sections: ${error.message}`);
+  }
+
+  return getPageSections();
+}
+
+// ---------------------------------------------------------------------------
+// Engagement Models
+// ---------------------------------------------------------------------------
+
+export async function getEngagementModels(): Promise<EngagementModel[]> {
+  const { data, error } = await supabase
+    .from("engagement_models")
+    .select("*")
+    .order("sort_order", { ascending: true });
+
+  if (error) return [];
+  return (data as EngagementModelRow[]).map(engagementModelFromRow);
+}
+
+export async function updateEngagementModels(
+  models: EngagementModel[]
+): Promise<EngagementModel[]> {
+  await supabaseAdmin.from("engagement_models").delete().neq("id", "");
+
+  if (models.length > 0) {
+    const rows = models.map(engagementModelToRow);
+    const { error } = await supabaseAdmin
+      .from("engagement_models")
+      .insert(rows);
+    if (error)
+      throw new Error(`Failed to update engagement models: ${error.message}`);
+  }
+
+  return getEngagementModels();
 }
 
 // ---------------------------------------------------------------------------

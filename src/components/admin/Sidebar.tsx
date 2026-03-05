@@ -3,13 +3,24 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ADMIN_NAV_LINKS } from "@/lib/constants";
-import { FaFolderOpen, FaCertificate, FaBriefcase, FaUser, FaSignOutAlt, FaTimes } from "react-icons/fa";
+import {
+  FaFolderOpen,
+  FaCertificate,
+  FaBriefcase,
+  FaUser,
+  FaSignOutAlt,
+  FaTimes,
+  FaLayerGroup,
+  FaHandshake,
+} from "react-icons/fa";
 
 const iconMap: Record<string, React.ComponentType<{ size?: number }>> = {
   FaFolderOpen,
   FaCertificate,
   FaBriefcase,
   FaUser,
+  FaLayerGroup,
+  FaHandshake,
 };
 
 interface SidebarProps {

@@ -72,7 +72,7 @@ export default function Contact({ profile }: ContactProps) {
     <section id="contact" className="portfolio-section">
       <div className="site-container">
         <div className="flex flex-col md:flex-row justify-between items-start gap-6 md:gap-12 mb-10 md:mb-12">
-          <SectionHeading overline="CONTACT" title="Let's Talk" gradientWord="Talk" />
+          <SectionHeading overline="CONTACT" title="Send a Message" gradientWord="Message" />
           <div>
             <h4 className="text-xs uppercase tracking-wider text-text-muted mb-2">Book a Call</h4>
             <a

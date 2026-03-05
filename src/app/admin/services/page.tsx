@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { Service } from "@/lib/types";
+import { PageSection, Service } from "@/lib/types";
 import Button from "@/components/ui/Button";
 import Input from "@/components/ui/Input";
 import Textarea from "@/components/ui/Textarea";
@@ -13,8 +13,81 @@ function isImageIcon(icon: string): boolean {
   return value.startsWith("/images/") || /^https?:\/\//i.test(value);
 }
 
+interface HowIWorkStep {
+  title: string;
+  description: string;
+}
+
+interface HowIWorkConfig {
+  heading: string;
+  intro: string;
+  steps: HowIWorkStep[];
+}
+
+const DEFAULT_HOW_I_WORK: HowIWorkConfig = {
+  heading: "How I Work",
+  intro:
+    "To keep projects focused and predictable, engagements follow a structured three-phase delivery model.",
+  steps: [
+    {
+      title: "Discovery & Planning",
+      description:
+        "To keep projects focused and predictable, engagements follow a structured three-phase delivery model.",
+    },
+    {
+      title: "Build & Integration",
+      description:
+        "The solution is developed and integrated with your existing systems while keeping security, governance, and maintainability in focus.",
+    },
+    {
+      title: "Deployment, Training & Handover",
+      description:
+        "A 14-day post-deployment warranty period is included to address any issues and ensure the system operates smoothly.",
+    },
+  ],
+};
+
+function normalizeHowIWorkContent(content: unknown): HowIWorkConfig {
+  if (!content || typeof content !== "object" || Array.isArray(content)) {
+    return DEFAULT_HOW_I_WORK;
+  }
+
+  const value = content as Record<string, unknown>;
+  const stepsInput = Array.isArray(value.steps) ? value.steps : [];
+  const steps = stepsInput
+    .map((step) => {
+      if (!step || typeof step !== "object" || Array.isArray(step)) return null;
+      const row = step as Record<string, unknown>;
+      return {
+        title: typeof row.title === "string" ? row.title : "",
+        description: typeof row.description === "string" ? row.description : "",
+      };
+    })
+    .filter((step): step is HowIWorkStep => step !== null)
+    .slice(0, 3);
+
+  const filledSteps = [...steps];
+  while (filledSteps.length < 3) {
+    filledSteps.push(DEFAULT_HOW_I_WORK.steps[filledSteps.length]);
+  }
+
+  return {
+    heading:
+      typeof value.heading === "string" && value.heading.trim().length > 0
+        ? value.heading
+        : DEFAULT_HOW_I_WORK.heading,
+    intro:
+      typeof value.intro === "string" && value.intro.trim().length > 0
+        ? value.intro
+        : DEFAULT_HOW_I_WORK.intro,
+    steps: filledSteps,
+  };
+}
+
 export default function AdminServices() {
   const [services, setServices] = useState<Service[]>([]);
+  const [sections, setSections] = useState<PageSection[]>([]);
+  const [howIWork, setHowIWork] = useState<HowIWorkConfig>(DEFAULT_HOW_I_WORK);
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
   const [uploadingServiceId, setUploadingServiceId] = useState<string | null>(null);
@@ -24,7 +97,21 @@ export default function AdminServices() {
     setServices(await res.json());
   }, []);
 
-  useEffect(() => { fetchServices(); }, [fetchServices]);
+  const fetchSections = useCallback(async () => {
+    const res = await fetch("/api/page-sections");
+    const data = (await res.json()) as PageSection[];
+    const list = Array.isArray(data) ? data : [];
+    setSections(list);
+
+    const servicesSection = list.find(
+      (section) => section.key === "services" && !section.isCustom
+    );
+    setHowIWork(normalizeHowIWorkContent(servicesSection?.content));
+  }, []);
+
+  useEffect(() => {
+    void Promise.all([fetchServices(), fetchSections()]);
+  }, [fetchServices, fetchSections]);
 
   const updateService = (serviceId: string, field: keyof Service, value: string | number) => {
     setServices((prev) =>
@@ -85,9 +172,44 @@ export default function AdminServices() {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(services),
     });
+
+    if (sections.length > 0) {
+      const nextSections = sections.map((section) => {
+        if (section.key !== "services" || section.isCustom) return section;
+        return {
+          ...section,
+          content: {
+            ...(section.content ?? {}),
+            heading: howIWork.heading,
+            intro: howIWork.intro,
+            steps: howIWork.steps.slice(0, 3),
+          },
+        };
+      });
+
+      await fetch("/api/page-sections", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(nextSections),
+      });
+    }
+
     setSaving(false);
     setSaved(true);
     setTimeout(() => setSaved(false), 2000);
+  };
+
+  const updateHowIWorkStep = (
+    index: number,
+    field: keyof HowIWorkStep,
+    value: string
+  ) => {
+    setHowIWork((prev) => {
+      const nextSteps = [...prev.steps];
+      nextSteps[index] = { ...nextSteps[index], [field]: value };
+      return { ...prev, steps: nextSteps };
+    });
+    setSaved(false);
   };
 
   return (
@@ -106,6 +228,56 @@ export default function AdminServices() {
       </div>
 
       <div className="space-y-6">
+        <div className="bg-bg-card border border-border-subtle rounded-xl p-6">
+          <h2 className="text-lg font-semibold text-text-primary mb-4">How I Work Section</h2>
+          <div className="space-y-4">
+            <Input
+              label="Section Heading"
+              value={howIWork.heading}
+              onChange={(event) => {
+                setHowIWork((prev) => ({ ...prev, heading: event.target.value }));
+                setSaved(false);
+              }}
+            />
+            <Textarea
+              label="Section Intro"
+              value={howIWork.intro}
+              onChange={(event) => {
+                setHowIWork((prev) => ({ ...prev, intro: event.target.value }));
+                setSaved(false);
+              }}
+            />
+            <div className="space-y-4">
+              {howIWork.steps.slice(0, 3).map((step, index) => (
+                <div
+                  key={`how-i-work-step-${index}`}
+                  className="rounded-lg border border-border-subtle bg-bg-input p-4"
+                >
+                  <p className="mb-3 text-xs uppercase tracking-[0.2em] text-text-muted">
+                    Step {index + 1}
+                  </p>
+                  <div className="space-y-3">
+                    <Input
+                      label="Title"
+                      value={step.title}
+                      onChange={(event) =>
+                        updateHowIWorkStep(index, "title", event.target.value)
+                      }
+                    />
+                    <Textarea
+                      label="Description"
+                      value={step.description}
+                      onChange={(event) =>
+                        updateHowIWorkStep(index, "description", event.target.value)
+                      }
+                    />
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+
         {[...services].sort((a, b) => a.order - b.order).map((service) => (
           <div key={service.id} className="bg-bg-card border border-border-subtle rounded-xl p-6">
             <div className="flex items-start justify-between mb-4">
